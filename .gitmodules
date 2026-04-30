@@ -1,0 +1,3 @@
+[submodule "map-viewer"]
+	path = map-viewer
+	url = https://github.com/MikhailKapitov/thesis-map-viewer.git

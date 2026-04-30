@@ -1,0 +1,3 @@
+npx expo export:embed --platform android --dev false --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+cd android && ./gradlew assembleDebug
+adb -s DEVICE_ID install app/build/outputs/apk/debug/app-debug.apk
