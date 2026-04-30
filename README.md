@@ -38,4 +38,5 @@ A part of our thesis project.
 - Testing?
 - Clean up the packages.
 - Clean up the permissions.
+- Code cleanup.
 - Optimisations?
