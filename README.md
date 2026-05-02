@@ -33,7 +33,7 @@ A part of our thesis project.
 ## TODO
 
 - Pray and run this on iOS;
-- Add all the missing server functionality (Like actually submitting files to server).
+- Add all the missing server functionality (Like stats and such).
 - Work on the UI/UX.
 - Testing?
 - Clean up the packages.
