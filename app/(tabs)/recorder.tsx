@@ -8,27 +8,18 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
+import * as Device from "expo-device";
 import notifee, {
   AndroidForegroundServiceType,
   AndroidImportance,
 } from "@notifee/react-native";
 import { AudioModule, RecordingPresets, useAudioRecorder } from "expo-audio";
-import * as FileSystem from "expo-file-system/legacy";
-import * as MediaLibrary from "expo-media-library";
-
 import { useLocation } from "@/context/LocationContext";
+import { api } from "@/services/api";
 
 const COUNTDOWN_SEC = 5;
 const RECORD_DURATION_MS = 2000;
 const CHANNEL_ID = "recorder";
-
-const randomStr = (len = 4) =>
-  Math.random()
-    .toString(36)
-    .slice(2, 2 + len);
-const formatTimestamp = (date: Date) =>
-  date.toISOString().replace(/\..+/, "").replace(/:/g, "-");
 
 export default function RecorderScreen() {
   const [isRunning, setIsRunning] = useState(false);
@@ -70,7 +61,6 @@ export default function RecorderScreen() {
     log(`▶ Recording for ${RECORD_DURATION_MS / 1000}s…`);
 
     try {
-      // Grab the latest location from the context (this will be fresh now).
       const location = lastLocation;
       if (!location) {
         log(`⚠️ Location unavailable ${isAcquiring ? "(acquiring…)" : ""}`);
@@ -87,37 +77,35 @@ export default function RecorderScreen() {
 
       const uri = audioRecorder.uri;
 
-      // Re‑prepare for the next cycle.
+      // Re‑prepare for the next cycle
       prepare();
 
       if (!uri) {
-        log("⚠️ No URI after stop — skipping save");
+        log("⚠️ No URI after stop — upload skipped");
         return;
       }
 
-      const lat = location?.coords.latitude.toFixed(6) ?? null;
-      const lon = location?.coords.longitude.toFixed(6) ?? null;
-      const accuracy = location?.coords.accuracy ?? null;
-
-      const coordStr = lat && lon ? `${lat}_${lon}` : "unknown";
-      const filename = `noiseapp_${coordStr}_${formatTimestamp(new Date())}_${randomStr()}.wav`;
-      const dest = FileSystem.cacheDirectory + filename;
-
-      await FileSystem.copyAsync({ from: uri, to: dest });
-      const asset = await MediaLibrary.createAssetAsync(dest);
-      const album = await MediaLibrary.getAlbumAsync("NoiseApp");
-      if (album) {
-        await MediaLibrary.addAssetsToAlbumAsync([asset], album, true);
-      } else {
-        await MediaLibrary.createAlbumAsync("NoiseApp", asset, true);
+      // Build metadata for upload
+      const lat = location?.coords.latitude;
+      const lon = location?.coords.longitude;
+      if (lat == null || lon == null) {
+        log("❌ No location data, upload skipped");
+        return;
       }
-      await FileSystem.deleteAsync(dest, { idempotent: true });
 
-      log(`✅ Saved: ${filename}`);
-      if (lat && lon) {
-        log(
-          `📍 ${lat}, ${lon}${accuracy != null ? ` (±${accuracy.toFixed(0)}m)` : ""}`,
-        );
+      const metadata = {
+        latitude: lat,
+        longitude: lon,
+        deviceModel: Device.modelName || "Unknown",
+        recordedAt: new Date().toISOString(),
+      };
+
+      log("📤 Uploading recording…");
+      try {
+        const result = await api.uploadRecording(uri, metadata);
+        log(`✅ Uploaded: ID ${result.id || "unknown"}`);
+      } catch (uploadErr: any) {
+        log(`❌ Upload failed: ${uploadErr.message}`);
       }
     } catch (e: any) {
       log(`❌ ${e.message}`);
@@ -126,18 +114,15 @@ export default function RecorderScreen() {
     }
   }, [lastLocation, isAcquiring, audioRecorder, log, prepare]);
 
-  // Keep a ref to the latest triggerRecording to avoid stale closures in the interval.
   const triggerRecordingRef = useRef(triggerRecording);
   useEffect(() => {
     triggerRecordingRef.current = triggerRecording;
   }, [triggerRecording]);
 
-  // Request permissions specific to this screen.
   useEffect(() => {
     (async () => {
       await AudioModule.requestRecordingPermissionsAsync();
-      await MediaLibrary.requestPermissionsAsync();
-
+      // MediaLibrary permissions no longer needed
       if (Platform.OS === "android" && Platform.Version >= 33) {
         await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
@@ -154,13 +139,11 @@ export default function RecorderScreen() {
     })();
   }, [prepare]);
 
-  // Countdown timer.
   useEffect(() => {
     if (!isRunning) return;
     const interval = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
-          // Use the ref to always call the latest triggerRecording.
           if (!isRecordingRef.current) triggerRecordingRef.current();
           return COUNTDOWN_SEC;
         }

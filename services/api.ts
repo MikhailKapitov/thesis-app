@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-community/async-storage";
+import * as FileSystem from 'expo-file-system/legacy';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || "http://10.0.2.2:5000";
 
@@ -129,6 +130,120 @@ export const api = {
       await this.setUserId(userId);
     }
     return userId;
+  },
+
+  // Uh... So this one is def. overcomplicated, need to test and maybe rewrite it. For some reason, naive FormData multipart breaks it?
+  async uploadRecording(
+    audioUri: string,
+    metadata: {
+      latitude: number;
+      longitude: number;
+      deviceModel: string;
+      recordedAt: string;
+    }
+  ): Promise<any> {
+    const userId = await this.getUserId();
+    if (!userId) throw new Error('User ID not found');
+
+    const accessToken = await this.getAccessToken();
+    if (!accessToken) throw new Error('Authentication token missing');
+
+    // Read the file as base64
+    const fileBase64 = await FileSystem.readAsStringAsync(audioUri, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+
+    // Convert base64 to binary Uint8Array safely
+    const binaryString = atob(fileBase64);
+    const binaryData = Uint8Array.from(binaryString, c => c.charCodeAt(0));
+
+    const boundary = '----FormBoundary' + Math.random().toString(36).slice(2);
+
+    // Helper to encode text as Uint8Array (UTF-8)
+    const encoder = new TextEncoder();
+    const encode = (str: string) => encoder.encode(str);
+
+    // Build the multipart body segments
+    const CRLF = '\r\n';
+    
+    // Part 1: audio file
+    const audioPart = [
+      `--${boundary}`,
+      `Content-Disposition: form-data; name="audio"; filename="recording.wav"`,
+      `Content-Type: audio/wav`,
+      '', // empty line before binary
+    ].join(CRLF) + CRLF; // need final CRLF to separate headers from binary
+
+    const audioPartEnd = CRLF; // after binary, we add a CRLF before the next boundary
+
+    // Part 2: metadata JSON
+    const metadataString = JSON.stringify(metadata);
+    const metadataPart = [
+      `--${boundary}`,
+      `Content-Disposition: form-data; name="metadata"`,
+      `Content-Type: application/json`,
+      '',
+      metadataString,
+    ].join(CRLF) + CRLF;
+
+    // Final boundary
+    const finalBoundary = `--${boundary}--`;
+
+    // Concatenate all parts into one Uint8Array
+    const audioPartBeforeBinary = encode(audioPart);
+    const audioPartEndEncoded = encode(audioPartEnd);
+    const metadataPartEncoded = encode(metadataPart);
+    const finalBoundaryEncoded = encode(finalBoundary);
+
+    // Total length
+    const totalLength =
+      audioPartBeforeBinary.length +
+      binaryData.length +
+      audioPartEndEncoded.length +
+      metadataPartEncoded.length +
+      finalBoundaryEncoded.length;
+
+    const bodyArray = new Uint8Array(totalLength);
+    let offset = 0;
+    bodyArray.set(audioPartBeforeBinary, offset);
+    offset += audioPartBeforeBinary.length;
+
+    bodyArray.set(binaryData, offset);
+    offset += binaryData.length;
+
+    bodyArray.set(audioPartEndEncoded, offset);
+    offset += audioPartEndEncoded.length;
+
+    bodyArray.set(metadataPartEncoded, offset);
+    offset += metadataPartEncoded.length;
+
+    bodyArray.set(finalBoundaryEncoded, offset);
+
+    console.log('[Upload] Sending to', `${API_BASE_URL}/api/v1/recordings`);
+
+    const response = await fetch(`${API_BASE_URL}/api/v1/recordings`, {
+      method: 'POST',
+      headers: {
+        'X-User-Id': userId,
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': `multipart/form-data; boundary=${boundary}`,
+      },
+      body: bodyArray,
+    });
+
+    const responseText = await response.text();
+    console.log('[Upload] Status:', response.status, responseText);
+
+    if (!response.ok) {
+      let errorMsg = responseText;
+      try {
+        const errJson = JSON.parse(responseText);
+        errorMsg = errJson.message || errJson.error || responseText;
+      } catch {}
+      throw new Error(`Upload failed (${response.status}): ${errorMsg}`);
+    }
+
+    return JSON.parse(responseText);
   },
 };
 
