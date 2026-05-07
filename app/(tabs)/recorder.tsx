@@ -13,7 +13,7 @@ import notifee, {
   AndroidForegroundServiceType,
   AndroidImportance,
 } from "@notifee/react-native";
-import { AudioModule, RecordingPresets, useAudioRecorder } from "expo-audio";
+import { AudioModule, RecordingPresets, useAudioRecorder, useAudioRecorderState } from "expo-audio";
 import { useLocation } from "@/context/LocationContext";
 import { api } from "@/services/api";
 
@@ -25,10 +25,15 @@ export default function RecorderScreen() {
   const [isRunning, setIsRunning] = useState(false);
   const [countdown, setCountdown] = useState(COUNTDOWN_SEC);
   const [logs, setLogs] = useState<string[]>([]);
+  const [currentMetering, setCurrentMetering] = useState(-160); // -160 dB = silence
 
   const isRecordingRef = useRef(false);
   const isPreparedRef = useRef(false);
-  const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  const audioRecorder = useAudioRecorder({
+    ...RecordingPresets.HIGH_QUALITY,
+    isMeteringEnabled: true,
+  });
+  const recorderStatus = useAudioRecorderState(audioRecorder);
 
   const { lastLocation, isAcquiring } = useLocation();
 
@@ -153,6 +158,25 @@ export default function RecorderScreen() {
     return () => clearInterval(interval);
   }, [isRunning]);
 
+  useEffect(() => {
+    if (!isRunning) return;
+    let interval: ReturnType<typeof setInterval>;
+    // Start polling when a recording is actually going on
+    if (recorderStatus.isRecording) {
+      interval = setInterval(async () => {
+        try {
+          const status = await audioRecorder.getStatus();
+          if (status.metering !== undefined) {
+            setCurrentMetering(status.metering);
+          }
+        } catch {}
+      }, 50); // Update delay in ms
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isRunning, recorderStatus.isRecording, audioRecorder]);
+
   const toggle = async () => {
     if (!isRunning) {
       setCountdown(COUNTDOWN_SEC);
@@ -192,9 +216,21 @@ export default function RecorderScreen() {
         <View style={styles.timerBox}>
           <Text style={styles.timerNumber}>{countdown}</Text>
           <Text style={styles.timerLabel}>
-            {isRecordingRef.current
-              ? "🔴 Recording…"
-              : "seconds until next recording"}
+            {isRecordingRef.current ? (
+              // Metering bar during recording
+              <View style={{ alignItems: 'center' }}>
+                <Text style={{ color: '#fff' }}>🔴 Recording…</Text>
+                <View style={styles.meterContainer}>
+                  <View style={[styles.meterBar, {
+                    width: `${Math.min(100, Math.max(0, (currentMetering + 60) * 2))}%`, // maps -60..-10 dB to 0..100%
+                    backgroundColor: currentMetering > -20 ? '#dc2626' : currentMetering > -40 ? '#f59e0b' : '#22c55e'
+                  }]} />
+                </View>
+                {/* <Text style={styles.meterText}>{currentMetering.toFixed(1)} dB</Text> */}
+              </View>
+            ) : (
+              "seconds until next recording"
+            )}
           </Text>
         </View>
       )}
@@ -266,4 +302,21 @@ const styles = StyleSheet.create({
   logContent: { gap: 4 },
   logLine: { color: "#ccc", fontFamily: "monospace", fontSize: 12 },
   logEmpty: { color: "#444", fontSize: 13, textAlign: "center", marginTop: 16 },
+  meterContainer: {
+  width: 100,
+  height: 8,
+  backgroundColor: '#333',
+  borderRadius: 4,
+  marginVertical: 4,
+  overflow: 'hidden',
+  },
+  meterBar: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  meterText: {
+    fontSize: 11,
+    color: '#aaa',
+    marginTop: 2,
+  },
 });
