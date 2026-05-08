@@ -306,6 +306,31 @@ export const api = {
       },
     });
   },
+
+  async getGamificationProfile() {
+    const userId = await this.getUserId();
+    if (!userId) throw new Error('User ID not found');
+    const token = await this.getAccessToken();
+    const res = await fetch(`${API_BASE_URL}/api/v1/gamification/me`, {
+      headers: {
+        'X-User-Id': userId,
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    if (!res.ok) throw new Error('Failed to fetch gamification profile');
+    return res.json();
+  },
+
+  async getLeaderboard(limit = 20) {
+    const token = await this.getAccessToken();
+    const res = await fetch(`${API_BASE_URL}/api/v1/gamification/leaderboard?limit=${limit}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    if (!res.ok) throw new Error('Failed to fetch leaderboard');
+    return res.json();
+  },
 };
 
 // Simple JWT decode (without validation) to extract user ID from payload
