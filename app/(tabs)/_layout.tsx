@@ -25,11 +25,11 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="settings"
         options={{
-          title: "Map",
+          title: "Settings",
           tabBarIcon: ({ color, size }) => (
-            <FontAwesome6 name="map-location-dot" size={size} color={color} />
+            <Ionicons name="settings-outline" size={size} color={color} />
           ),
         }}
       />
@@ -43,11 +43,20 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="settings"
+        name="index"
         options={{
-          title: "Settings",
+          title: "Map",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="settings-outline" size={size} color={color} />
+            <FontAwesome6 name="map-location-dot" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="gamification"
+        options={{
+          title: 'Gamification',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="trophy-outline" size={size} color={color} />
           ),
         }}
       />
@@ -58,15 +67,6 @@ export default function TabLayout() {
           tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="notifications-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="gamification"
-        options={{
-          title: 'Gamification',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="trophy-outline" size={size} color={color} />
           ),
         }}
       />
