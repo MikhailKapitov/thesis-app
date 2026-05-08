@@ -245,6 +245,67 @@ export const api = {
 
     return JSON.parse(responseText);
   },
+
+  async getNotifications(page = 0, size = 20) {
+    const userId = await this.getUserId();
+    if (!userId) throw new Error('User ID not found');
+    const token = await this.getAccessToken();
+    const res = await fetch(`${API_BASE_URL}/api/v1/notifications?page=${page}&size=${size}`, {
+      headers: {
+        'X-User-Id': userId,
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    if (!res.ok) throw new Error('Failed to fetch notifications');
+    return res.json();
+  },
+
+  async getUnreadCount() {
+    const userId = await this.getUserId();
+    const token = await this.getAccessToken();
+    console.log('[Notifications] fetch unread count – userId:', userId, 'token:', token?.slice(0, 20) + '...');
+    if (!userId || !token) throw new Error('Missing authentication');
+
+    const url = `${API_BASE_URL}/api/v1/notifications/unread-count`;
+    console.log('[Notifications] GET', url);
+    const res = await fetch(url, {
+      headers: {
+        'X-User-Id': userId!,
+        'Authorization': `Bearer ${token!}`,
+      },
+    });
+
+    const text = await res.text();
+    console.log('[Notifications] Response status:', res.status, 'body:', text);
+    if (!res.ok) throw new Error(`Failed to fetch unread count – ${res.status}: ${text}`);
+    return JSON.parse(text).count ?? 0;
+  },
+
+  async markNotificationRead(id: string) {
+    const userId = await this.getUserId();
+    if (!userId) throw new Error('User ID not found');
+    const token = await this.getAccessToken();
+    await fetch(`${API_BASE_URL}/api/v1/notifications/${id}/read`, {
+      method: 'PUT',
+      headers: {
+        'X-User-Id': userId,
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+  },
+
+  async markAllNotificationsRead() {
+    const userId = await this.getUserId();
+    if (!userId) throw new Error('User ID not found');
+    const token = await this.getAccessToken();
+    await fetch(`${API_BASE_URL}/api/v1/notifications/read-all`, {
+      method: 'PUT',
+      headers: {
+        'X-User-Id': userId,
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+  },
 };
 
 // Simple JWT decode (without validation) to extract user ID from payload

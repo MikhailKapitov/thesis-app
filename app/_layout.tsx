@@ -12,6 +12,7 @@ import { ActivityIndicator, View } from "react-native";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { LocationProvider } from "@/context/LocationContext";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { NotificationProvider } from "@/context/NotificationContext";
 
 import notifee from "@notifee/react-native";
 
@@ -43,7 +44,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
       // Redirect to tabs if authenticated and trying to access auth screens
       router.replace("/(tabs)");
     }
-  }, [user, isLoading, segments]);
+  }, [user, isLoading, segments, router]);
 
   if (isLoading) {
     return (
@@ -86,9 +87,11 @@ export default function RootLayout() {
   return (
     <LocationProvider>
       <AuthProvider>
-        <AuthGuard>
-          <RootLayoutNav />
-        </AuthGuard>
+        <NotificationProvider>
+          <AuthGuard>
+            <RootLayoutNav />
+          </AuthGuard>
+        </NotificationProvider>
       </AuthProvider>
     </LocationProvider>
   );

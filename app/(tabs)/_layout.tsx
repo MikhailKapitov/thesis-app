@@ -10,8 +10,11 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
+import { useNotificationContext } from '@/context/NotificationContext';
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { unreadCount } = useNotificationContext();
 
   return (
     <Tabs
@@ -22,7 +25,7 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="map"
+        name="index"
         options={{
           title: "Map",
           tabBarIcon: ({ color, size }) => (
@@ -45,6 +48,16 @@ export default function TabLayout() {
           title: "Settings",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="settings-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="notifications"
+        options={{
+          title: 'Notifications',
+          tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="notifications-outline" size={size} color={color} />
           ),
         }}
       />
