@@ -331,6 +331,26 @@ export const api = {
     if (!res.ok) throw new Error('Failed to fetch leaderboard');
     return res.json();
   },
+
+  async getCityStats() {
+    const res = await fetch(`${API_BASE_URL}/api/v1/stats/city`);
+    if (!res.ok) throw new Error('Failed to fetch city statistics');
+    return res.json();
+  },
+
+  async getMyStats() {
+    const userId = await this.getUserId();
+    if (!userId) throw new Error('User ID not found');
+    const token = await this.getAccessToken();
+    const res = await fetch(`${API_BASE_URL}/api/v1/stats/me`, {
+      headers: {
+        'X-User-Id': userId,
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    if (!res.ok) throw new Error('Failed to fetch personal statistics');
+    return res.json();
+  },
 };
 
 // Simple JWT decode (without validation) to extract user ID from payload
