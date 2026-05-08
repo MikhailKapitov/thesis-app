@@ -79,27 +79,32 @@ export default function GamificationScreen() {
     </View>
   );
 
-  const renderLeader = ({ item }: { item: LeaderboardEntry }) => (
-    <View style={[
-      styles.leaderCard,
-      item.rank === 1 && styles.leaderTop,
-      item.rank === 2 && styles.leaderSecond,
-      item.rank === 3 && styles.leaderThird,
-    ]}>
-      <View style={styles.rankBadge}>
-        <Text style={styles.rankText}>{item.rank}</Text>
+  const renderLeader = ({ item }: { item: LeaderboardEntry }) => {
+    const isYou = profile?.userId === item.userId;
+
+    return (
+      <View style={[
+        styles.leaderCard,
+        item.rank === 1 && styles.leaderTop,
+        item.rank === 2 && styles.leaderSecond,
+        item.rank === 3 && styles.leaderThird,
+        isYou && styles.leaderYou,   // <-- special style for yourself
+      ]}>
+        <View style={styles.rankBadge}>
+          <Text style={styles.rankText}>{item.rank}</Text>
+        </View>
+        <View style={styles.leaderInfo}>
+          <Text style={styles.leaderName} numberOfLines={1}>
+            {isYou ? 'You' : `${item.userId.slice(0, 8)}...`}
+          </Text>
+          <Text style={styles.leaderStats}>
+            {item.totalPoints} pts · Level {item.level}
+          </Text>
+        </View>
+        <Text style={styles.leaderRecordings}>{item.totalRecordings} rec</Text>
       </View>
-      <View style={styles.leaderInfo}>
-        <Text style={styles.leaderName} numberOfLines={1}>
-          {item.userId.slice(0, 8)}...
-        </Text>
-        <Text style={styles.leaderStats}>
-          {item.totalPoints} pts · Level {item.level}
-        </Text>
-      </View>
-      <Text style={styles.leaderRecordings}>{item.totalRecordings} rec</Text>
-    </View>
-  );
+    );
+  };
 
   if (loading && !profile) {
     return (
@@ -351,5 +356,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 40,
     fontSize: 16,
+  },
+    leaderYou: {
+    borderLeftWidth: 4,
+    borderLeftColor: '#2563eb',
   },
 });
