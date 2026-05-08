@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import { api } from '@/services/api';
 
@@ -35,20 +36,16 @@ interface LeaderboardEntry {
   level: number;
 }
 
-const sectionColors = {
-  profile: '#1e293b',   // slate
-  achievements: '#0f172a',
-  leaderboard: '#1e293b',
-};
-
 export default function GamificationScreen() {
   const [profile, setProfile] = useState<GamificationProfile | null>(null);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<'profile' | 'leaderboard'>('profile');
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
+  const fetchData = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
+    setRefreshing(true);
     try {
       const [profileData, leaderboardData] = await Promise.all([
         api.getGamificationProfile(),
@@ -60,6 +57,7 @@ export default function GamificationScreen() {
       Alert.alert('Error', err.message);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, []);
 
@@ -162,6 +160,13 @@ export default function GamificationScreen() {
           ListEmptyComponent={() => (
             <Text style={styles.emptyText}>No achievements yet</Text>
           )}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => fetchData(true)}
+              tintColor="#2563eb"
+            />
+          }
         />
       ) : (
         <FlatList
@@ -172,6 +177,13 @@ export default function GamificationScreen() {
           ListEmptyComponent={() => (
             <Text style={styles.emptyText}>Leaderboard unavailable</Text>
           )}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => fetchData(true)}
+              tintColor="#2563eb"
+            />
+          }
         />
       )}
     </View>
