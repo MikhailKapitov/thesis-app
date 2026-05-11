@@ -4,6 +4,8 @@ A part of our thesis project.
 
 ## Setup
 
+After cloning this repository, make sure to run `git submodule update --init --recursive` first.
+
 1. Install dependencies.
    ```bash
    npm install --legacy-peer-deps
