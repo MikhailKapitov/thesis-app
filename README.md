@@ -10,7 +10,9 @@ A part of our thesis project.
    ```
 2. Pull and update the submodule.
    ```bash
-   git submodule update --init --recursive
+   cd ./map-viewer
+   git pull origin main
+   cd ..
    ```
 3. Generate the map from the submodule.
    ```bash
