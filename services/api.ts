@@ -215,7 +215,7 @@ export const api = {
     }
   ): Promise<any> {
     const userId = await this.getUserId();
-    if (!userId) throw new Error('User ID not found');
+    if (!userId) throw new Error('User ID   not found');
 
     const formData = new FormData();
 
@@ -336,6 +336,33 @@ export const api = {
     });
     if (!res.ok) throw new Error('Failed to fetch personal statistics');
     return res.json();
+  },
+
+  async addComment(comment: {
+    latitude: number;
+    longitude: number;
+    text: string;
+    noiseClass?: string;
+    noiseLevelDba?: number;
+  }) {
+    const userId = await this.getUserId();
+    if (!userId) throw new Error('User ID not found');
+    const cachedUser = await AsyncStorage.getItem('cachedUser');
+    let displayName = 'Anonymous'; // TODO.
+    if (cachedUser) {
+      try { displayName = JSON.parse(cachedUser).displayName; } catch {}
+    }
+
+    const response = await this.fetch('/api/v1/comments', {
+      method: 'POST',
+      headers: {
+        'X-User-Id': userId,
+        'X-Display-Name': displayName,
+      },
+      body: JSON.stringify(comment),
+    });
+    if (!response.ok) throw new Error('Failed to add comment');
+    return response.json();
   },
 };
 
