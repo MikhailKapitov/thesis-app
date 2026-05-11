@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-community/async-storage";
-import * as FileSystem from 'expo-file-system/legacy';
+// import { File } from 'expo-file-system';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || "http://10.0.2.2:5000";
 
@@ -8,6 +8,54 @@ const ACCESS_TOKEN_KEY = "accessToken";
 const REFRESH_TOKEN_KEY = "refreshToken";
 const USER_ID_KEY = "userId";
 
+// Refresh lock
+let refreshPromise: Promise<string | null> | null = null;
+
+async function refreshAccessToken(): Promise<string | null> {
+  const refreshToken = await AsyncStorage.getItem(REFRESH_TOKEN_KEY);
+  if (!refreshToken) return null;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/auth/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken }),
+    });
+
+    if (!response.ok) {
+      // Refresh token invalid or expired.
+      return null;
+    }
+
+    const data = await response.json();
+    const { accessToken, refreshToken: newRefreshToken } = data;
+
+    if (accessToken) {
+      await AsyncStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+      if (newRefreshToken) {
+        await AsyncStorage.setItem(REFRESH_TOKEN_KEY, newRefreshToken);
+      }
+      return accessToken;
+    }
+    return null;
+  } catch (err) {
+    console.warn('[API] Refresh network error:', err);
+    return null;
+  }
+}
+
+async function tryRefreshToken(): Promise<string | null> {
+  // If a refresh is already in progress, wait for it
+  if (refreshPromise) return refreshPromise;
+
+  refreshPromise = refreshAccessToken().finally(() => {
+    refreshPromise = null;
+  });
+
+  return refreshPromise;
+}
+
+// ─── Main API object ────────────────────────────────────
 export const api = {
   // Token management
   async getAccessToken(): Promise<string | null> {
@@ -23,8 +71,10 @@ export const api = {
   },
 
   async setTokens(accessToken: string, refreshToken: string): Promise<void> {
-    await AsyncStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-    await AsyncStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+    await AsyncStorage.multiSet([
+      [ACCESS_TOKEN_KEY, accessToken],
+      [REFRESH_TOKEN_KEY, refreshToken],
+    ]);
   },
 
   async setUserId(userId: string): Promise<void> {
@@ -32,26 +82,49 @@ export const api = {
   },
 
   async clearTokens(): Promise<void> {
-    await AsyncStorage.removeItem(ACCESS_TOKEN_KEY);
-    await AsyncStorage.removeItem(REFRESH_TOKEN_KEY);
-    await AsyncStorage.removeItem(USER_ID_KEY);
+    await AsyncStorage.multiRemove([ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, USER_ID_KEY]);
   },
 
-  // Base fetch with auth header
+  // Core fetch with automatic token refresh.
   async fetch(endpoint: string, options: RequestInit = {}): Promise<Response> {
-    const accessToken = await this.getAccessToken();
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      ...(options.headers as Record<string, string>),
-    };
-    if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`;
-    }
+    let accessToken = await this.getAccessToken();
+    const isFormData = options.body instanceof FormData;
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const buildHeaders = (token: string | null) => {
+      const headers: Record<string, string> = {
+        ...(options.headers as Record<string, string>),
+      };
+      // Only set default Content-Type for non‑FormData requests
+      if (!isFormData && !headers['Content-Type']) {
+        headers['Content-Type'] = 'application/json';
+      }
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      return headers;
+    };
+
+    let response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
-      headers,
+      headers: buildHeaders(accessToken),
     });
+
+    // Token refresh (same as before)
+    if (response.status === 401 && accessToken) {
+      console.log('[API] Received 401, attempting token refresh...');
+      const newToken = await tryRefreshToken();
+      if (newToken) {
+        console.log('[API] Token refreshed, retrying request...');
+        response = await fetch(`${API_BASE_URL}${endpoint}`, {
+          ...options,
+          headers: buildHeaders(newToken),
+        });
+      } else {
+        console.warn('[API] Refresh failed, logging out...');
+        await this.clearTokens();
+        throw new Error('Session expired. Please log in again.');
+      }
+    }
 
     return response;
   },
@@ -119,7 +192,6 @@ export const api = {
     return response.json();
   },
 
-  // Helper: after login/register, store tokens and extract user ID from JWT
   async authenticate(authResponse: {
     accessToken: string;
     refreshToken: string;
@@ -132,7 +204,7 @@ export const api = {
     return userId;
   },
 
-  // Uh... So this one is def. overcomplicated, need to test and maybe rewrite it. For some reason, naive FormData multipart breaks it?
+  // YAY.
   async uploadRecording(
     audioUri: string,
     metadata: {
@@ -145,115 +217,43 @@ export const api = {
     const userId = await this.getUserId();
     if (!userId) throw new Error('User ID not found');
 
-    const accessToken = await this.getAccessToken();
-    if (!accessToken) throw new Error('Authentication token missing');
+    const formData = new FormData();
 
-    // Read the file as base64
-    const fileBase64 = await FileSystem.readAsStringAsync(audioUri, {
-      encoding: FileSystem.EncodingType.Base64,
-    });
+    // Standard React Native file upload shape – works with any URI string
+    formData.append('audio', {
+      uri: audioUri,
+      type: 'audio/wav',
+      name: 'recording.wav',
+    } as any);
 
-    // Convert base64 to binary Uint8Array safely
-    const binaryString = atob(fileBase64);
-    const binaryData = Uint8Array.from(binaryString, c => c.charCodeAt(0));
+    // Server now expects separate fields, not a metadata JSON
+    formData.append('latitude', String(metadata.latitude));
+    formData.append('longitude', String(metadata.longitude));
+    formData.append('deviceModel', metadata.deviceModel);
+    formData.append('recordedAt', metadata.recordedAt);
 
-    const boundary = '----FormBoundary' + Math.random().toString(36).slice(2);
-
-    // Helper to encode text as Uint8Array (UTF-8)
-    const encoder = new TextEncoder();
-    const encode = (str: string) => encoder.encode(str);
-
-    // Build the multipart body segments
-    const CRLF = '\r\n';
-    
-    // Part 1: audio file
-    const audioPart = [
-      `--${boundary}`,
-      `Content-Disposition: form-data; name="audio"; filename="recording.wav"`,
-      `Content-Type: audio/wav`,
-      '', // empty line before binary
-    ].join(CRLF) + CRLF; // need final CRLF to separate headers from binary
-
-    const audioPartEnd = CRLF; // after binary, we add a CRLF before the next boundary
-
-    // Part 2: metadata JSON
-    const metadataString = JSON.stringify(metadata);
-    const metadataPart = [
-      `--${boundary}`,
-      `Content-Disposition: form-data; name="metadata"`,
-      `Content-Type: application/json`,
-      '',
-      metadataString,
-    ].join(CRLF) + CRLF;
-
-    // Final boundary
-    const finalBoundary = `--${boundary}--`;
-
-    // Concatenate all parts into one Uint8Array
-    const audioPartBeforeBinary = encode(audioPart);
-    const audioPartEndEncoded = encode(audioPartEnd);
-    const metadataPartEncoded = encode(metadataPart);
-    const finalBoundaryEncoded = encode(finalBoundary);
-
-    // Total length
-    const totalLength =
-      audioPartBeforeBinary.length +
-      binaryData.length +
-      audioPartEndEncoded.length +
-      metadataPartEncoded.length +
-      finalBoundaryEncoded.length;
-
-    const bodyArray = new Uint8Array(totalLength);
-    let offset = 0;
-    bodyArray.set(audioPartBeforeBinary, offset);
-    offset += audioPartBeforeBinary.length;
-
-    bodyArray.set(binaryData, offset);
-    offset += binaryData.length;
-
-    bodyArray.set(audioPartEndEncoded, offset);
-    offset += audioPartEndEncoded.length;
-
-    bodyArray.set(metadataPartEncoded, offset);
-    offset += metadataPartEncoded.length;
-
-    bodyArray.set(finalBoundaryEncoded, offset);
-
-    console.log('[Upload] Sending to', `${API_BASE_URL}/api/v1/recordings`);
-
-    const response = await fetch(`${API_BASE_URL}/api/v1/recordings`, {
+    const response = await this.fetch('/api/v1/recordings', {
       method: 'POST',
       headers: {
         'X-User-Id': userId,
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': `multipart/form-data; boundary=${boundary}`,
+        // No Content-Type – fetch will set multipart/form-data automatically
       },
-      body: bodyArray,
+      body: formData,
     });
 
-    const responseText = await response.text();
-    console.log('[Upload] Status:', response.status, responseText);
-
     if (!response.ok) {
-      let errorMsg = responseText;
-      try {
-        const errJson = JSON.parse(responseText);
-        errorMsg = errJson.message || errJson.error || responseText;
-      } catch {}
-      throw new Error(`Upload failed (${response.status}): ${errorMsg}`);
+      const errorText = await response.text();
+      throw new Error(`Upload failed (${response.status}): ${errorText}`);
     }
-
-    return JSON.parse(responseText);
+    return response.json();
   },
 
   async getNotifications(page = 0, size = 20) {
     const userId = await this.getUserId();
     if (!userId) throw new Error('User ID not found');
-    const token = await this.getAccessToken();
-    const res = await fetch(`${API_BASE_URL}/api/v1/notifications?page=${page}&size=${size}`, {
+    const res = await this.fetch(`/api/v1/notifications?page=${page}&size=${size}`, {
       headers: {
         'X-User-Id': userId,
-        'Authorization': `Bearer ${token}`,
       },
     });
     if (!res.ok) throw new Error('Failed to fetch notifications');
@@ -262,16 +262,12 @@ export const api = {
 
   async getUnreadCount() {
     const userId = await this.getUserId();
-    const token = await this.getAccessToken();
-    console.log('[Notifications] fetch unread count – userId:', userId, 'token:', token?.slice(0, 20) + '...');
-    if (!userId || !token) throw new Error('Missing authentication');
+    if (!userId) throw new Error('Missing authentication');
 
-    const url = `${API_BASE_URL}/api/v1/notifications/unread-count`;
-    console.log('[Notifications] GET', url);
-    const res = await fetch(url, {
+    console.log('[Notifications] fetch unread count - userId:', userId);
+    const res = await this.fetch(`/api/v1/notifications/unread-count`, {
       headers: {
-        'X-User-Id': userId!,
-        'Authorization': `Bearer ${token!}`,
+        'X-User-Id': userId,
       },
     });
 
@@ -284,12 +280,10 @@ export const api = {
   async markNotificationRead(id: string) {
     const userId = await this.getUserId();
     if (!userId) throw new Error('User ID not found');
-    const token = await this.getAccessToken();
-    await fetch(`${API_BASE_URL}/api/v1/notifications/${id}/read`, {
+    await this.fetch(`/api/v1/notifications/${id}/read`, {
       method: 'PUT',
       headers: {
         'X-User-Id': userId,
-        'Authorization': `Bearer ${token}`,
       },
     });
   },
@@ -297,12 +291,10 @@ export const api = {
   async markAllNotificationsRead() {
     const userId = await this.getUserId();
     if (!userId) throw new Error('User ID not found');
-    const token = await this.getAccessToken();
-    await fetch(`${API_BASE_URL}/api/v1/notifications/read-all`, {
+    await this.fetch(`/api/v1/notifications/read-all`, {
       method: 'PUT',
       headers: {
         'X-User-Id': userId,
-        'Authorization': `Bearer ${token}`,
       },
     });
   },
@@ -310,11 +302,9 @@ export const api = {
   async getGamificationProfile() {
     const userId = await this.getUserId();
     if (!userId) throw new Error('User ID not found');
-    const token = await this.getAccessToken();
-    const res = await fetch(`${API_BASE_URL}/api/v1/gamification/me`, {
+    const res = await this.fetch(`/api/v1/gamification/me`, {
       headers: {
         'X-User-Id': userId,
-        'Authorization': `Bearer ${token}`,
       },
     });
     if (!res.ok) throw new Error('Failed to fetch gamification profile');
@@ -322,10 +312,8 @@ export const api = {
   },
 
   async getLeaderboard(limit = 20) {
-    const token = await this.getAccessToken();
-    const res = await fetch(`${API_BASE_URL}/api/v1/gamification/leaderboard?limit=${limit}`, {
+    const res = await this.fetch(`/api/v1/gamification/leaderboard?limit=${limit}`, {
       headers: {
-        'Authorization': `Bearer ${token}`,
       },
     });
     if (!res.ok) throw new Error('Failed to fetch leaderboard');
@@ -333,7 +321,7 @@ export const api = {
   },
 
   async getCityStats() {
-    const res = await fetch(`${API_BASE_URL}/api/v1/stats/city`);
+    const res = await this.fetch(`/api/v1/stats/city`);
     if (!res.ok) throw new Error('Failed to fetch city statistics');
     return res.json();
   },
@@ -341,11 +329,9 @@ export const api = {
   async getMyStats() {
     const userId = await this.getUserId();
     if (!userId) throw new Error('User ID not found');
-    const token = await this.getAccessToken();
-    const res = await fetch(`${API_BASE_URL}/api/v1/stats/me`, {
+    const res = await this.fetch(`/api/v1/stats/me`, {
       headers: {
         'X-User-Id': userId,
-        'Authorization': `Bearer ${token}`,
       },
     });
     if (!res.ok) throw new Error('Failed to fetch personal statistics');
