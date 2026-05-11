@@ -96,22 +96,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         const token = await api.getAccessToken();
         const userId = await api.getUserId();
-        console.log(
-          "[Auth] Stored token:",
-          token ? token.slice(0, 20) + "..." : null,
-        );
-        console.log("[Auth] Stored userId:", userId);
-
         if (token && userId) {
-          console.log("[Auth] Attempting to fetch /me...");
           try {
             const profile = await api.getMe();
-            console.log("[Auth] /me succeeded, setting user:", profile.email);
             setUser(profile);
             await cacheUser(profile);
             setIsOffline(false);
           } catch (fetchError: any) {
-            // Network error or server unreachable – fall back to cached user
             if (
               fetchError.message?.includes("Network request failed") ||
               fetchError.message?.includes("Failed to fetch")
@@ -119,16 +110,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
               console.warn("[Auth] Network error, loading cached user");
               const cachedUser = await loadCachedUser();
               if (cachedUser) {
-                console.log("[Auth] Using cached user:", cachedUser.email);
                 setUser(cachedUser);
                 setIsOffline(true);
               } else {
-                // No cached user – stay logged out
-                console.log("[Auth] No cached user available");
                 setUser(null);
               }
             } else {
-              // Auth error (401/403) – clear tokens
+              // Auth error (even after refresh) – clear tokens
               console.error("[Auth] Auth error during /me:", fetchError);
               await api.clearTokens();
               await clearCachedUser();
@@ -136,14 +124,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             }
           }
         } else {
-          console.log("[Auth] No credentials, user remains null");
           setUser(null);
         }
       } catch (e) {
         console.error("[Auth] Unexpected error during loadUser:", e);
         setUser(null);
       } finally {
-        console.log("[Auth] loadUser finished, isLoading -> false");
         setIsLoading(false);
       }
     };
