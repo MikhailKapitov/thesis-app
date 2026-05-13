@@ -10,13 +10,11 @@ After cloning this repository, make sure to run `git submodule update --init --r
    ```bash
    npm install --legacy-peer-deps
    ```
-2. Pull and update the submodule.
+2. Init the submodule. Only needs to be done once.
    ```bash
-   cd ./map-viewer
-   git pull origin main
-   cd ..
+   git submodule update --init --recursive
    ```
-3. Generate the map from the submodule.
+3. Generate the map from the submodule. You should do this every time it is updated.
    ```bash
    npm run gen-map
    ```
