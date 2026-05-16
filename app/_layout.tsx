@@ -13,6 +13,7 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { LocationProvider } from "@/context/LocationContext";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { NotificationProvider } from "@/context/NotificationContext";
+import { LanguageProvider } from '@/context/LanguageContext';
 
 import notifee from "@notifee/react-native";
 
@@ -87,11 +88,13 @@ export default function RootLayout() {
   return (
     <LocationProvider>
       <AuthProvider>
-        <NotificationProvider>
+        <LanguageProvider>
+          <NotificationProvider>
           <AuthGuard>
             <RootLayoutNav />
           </AuthGuard>
         </NotificationProvider>
+        </LanguageProvider>
       </AuthProvider>
     </LocationProvider>
   );

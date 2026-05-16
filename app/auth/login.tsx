@@ -9,10 +9,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  View,
 } from "react-native";
 import { useAuth } from "@/context/AuthContext";
 import { Link } from "expo-router";
 import { useThemeColors } from '@/hooks/useThemeColors';
+import LanguagePicker from '@/components/LanguagePicker';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -47,6 +49,9 @@ export default function LoginScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
+        <View style={{ position: 'absolute', top: 64, right: 12, zIndex: 10 }}>
+          <LanguagePicker />
+        </View>
         <Text style={[styles.title, { color: textColor }]}>Login</Text>
         <TextInput
           style={[styles.input, { backgroundColor: inputBg, color: textColor }]}

@@ -2,6 +2,8 @@ import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useAuth } from "@/context/AuthContext";
 import { useThemeColors } from "@/hooks/useThemeColors";
 
+import LanguagePicker from '@/components/LanguagePicker';
+
 export default function SettingsScreen() {
   const { user, logout } = useAuth();
   const colors = useThemeColors();
@@ -22,6 +24,10 @@ export default function SettingsScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
       <Text style={[styles.title, { color: colors.textColor }]}>Settings</Text>
+
+      <View style={{ position: 'absolute', top: 64, right: 12, zIndex: 10 }}>
+        <LanguagePicker />
+      </View>
 
       <View style={styles.section}>
         <Text style={[styles.label, { color: colors.isDark ? '#888' : '#6b7280' }]}>Account</Text>
