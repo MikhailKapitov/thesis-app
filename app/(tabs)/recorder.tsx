@@ -23,10 +23,17 @@ const COUNTDOWN_SEC = 5;
 const RECORD_DURATION_MS = 2000;
 const CHANNEL_ID = "recorder";
 
+// Store translation keys and params instead of basic translated strings.
+type LogEntry = {
+  key: string;
+  params?: Record<string, string | number>;
+  timestamp: string;
+};
+
 export default function RecorderScreen() {
   const [isRunning, setIsRunning] = useState(false);
   const [countdown, setCountdown] = useState(COUNTDOWN_SEC);
-  const [logs, setLogs] = useState<string[]>([]);
+  const [logEntries, setLogEntries] = useState<LogEntry[]>([]);
   const [currentMetering, setCurrentMetering] = useState(-160);
 
   const isRecordingRef = useRef(false);
@@ -41,8 +48,11 @@ export default function RecorderScreen() {
   const colors = useThemeColors();
   const { t } = useLanguage();
 
-  const log = useCallback((msg: string) => {
-    setLogs((prev) => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev]);
+  const log = useCallback((key: string, params?: Record<string, string | number>) => {
+    setLogEntries((prev) => [
+      { key, params, timestamp: new Date().toLocaleTimeString() },
+      ...prev,
+    ]);
   }, []);
 
   const prepare = useCallback(async () => {
@@ -55,28 +65,28 @@ export default function RecorderScreen() {
         return;
       }
       isPreparedRef.current = false;
-      log(t('recorder.logPrepareFailed', { message: e.message }));
+      log('recorder.logPrepareFailed', { message: e.message });
     }
-  }, [audioRecorder, log, t]);
+  }, [audioRecorder, log]);
 
   const triggerRecording = useCallback(async () => {
     if (!isPreparedRef.current) {
-      log(t('recorder.logNotReady'));
+      log('recorder.logNotReady');
       await prepare();
       if (!isPreparedRef.current) {
-        log(t('recorder.logReprepareFailed'));
+        log('recorder.logReprepareFailed');
         return;
       }
     }
 
     isRecordingRef.current = true;
     isPreparedRef.current = false;
-    log(t('recorder.logRecordingFor', { duration: RECORD_DURATION_MS / 1000 }));
+    log('recorder.logRecordingFor', { duration: RECORD_DURATION_MS / 1000 });
 
     try {
       const location = lastLocation;
       if (!location) {
-        log(t('recorder.logLocationUnavailable', { acquiring: isAcquiring ? t('recorder.acquiring') : '' }));
+        log('recorder.logLocationUnavailable', { acquiring: isAcquiring ? t('recorder.acquiring') : '' });
       }
 
       audioRecorder.record();
@@ -85,7 +95,7 @@ export default function RecorderScreen() {
       if (audioRecorder.isRecording) {
         await audioRecorder.stop();
       } else {
-        log(t('recorder.logRecorderStoppedUnexpectedly'));
+        log('recorder.logRecorderStoppedUnexpectedly');
       }
 
       const uri = audioRecorder.uri;
@@ -93,14 +103,14 @@ export default function RecorderScreen() {
       prepare();
 
       if (!uri) {
-        log(t('recorder.logNoUri'));
+        log('recorder.logNoUri');
         return;
       }
 
       const lat = location?.coords.latitude;
       const lon = location?.coords.longitude;
       if (lat == null || lon == null) {
-        log(t('recorder.logNoLocationData'));
+        log('recorder.logNoLocationData');
         return;
       }
 
@@ -111,15 +121,15 @@ export default function RecorderScreen() {
         recordedAt: new Date().toISOString(),
       };
 
-      log(t('recorder.logUploading'));
+      log('recorder.logUploading');
       try {
         const result = await api.uploadRecording(uri, metadata);
-        log(t('recorder.logUploaded', { id: result.id || 'unknown' }));
+        log('recorder.logUploaded', { id: result.id || 'unknown' });
       } catch (uploadErr: any) {
-        log(t('recorder.logUploadFailed', { message: uploadErr.message }));
+        log('recorder.logUploadFailed', { message: uploadErr.message });
       }
     } catch (e: any) {
-      log(t('recorder.logError', { message: e.message }));
+      log('recorder.logError', { message: e.message });
     } finally {
       isRecordingRef.current = false;
     }
@@ -250,12 +260,12 @@ export default function RecorderScreen() {
         style={[styles.logBox, { backgroundColor: colors.inputBg }]}
         contentContainerStyle={styles.logContent}
       >
-        {logs.length === 0 ? (
+        {logEntries.length === 0 ? (
           <Text style={[styles.logEmpty, { color: colors.isDark ? '#444' : '#9ca3af' }]}>{t('recorder.logsEmpty')}</Text>
         ) : (
-          logs.map((l, i) => (
+          logEntries.map((entry, i) => (
             <Text key={i} style={[styles.logLine, { color: colors.isDark ? '#ccc' : '#4b5563' }]}>
-              {l}
+              [{entry.timestamp}] {t(entry.key, entry.params)}
             </Text>
           ))
         )}
