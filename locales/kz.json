@@ -1,1 +1,155 @@
-{}
+{
+  "auth": {
+    "loginTitle": "Кіру",
+    "registerTitle": "Тіркелу",
+    "email": "Электрондық пошта",
+    "password": "Құпия сөз",
+    "displayName": "Көрсетілетін аты",
+    "confirmPassword": "Құпия сөзді растау",
+    "loginButton": "Кіру",
+    "registerButton": "Тіркелу",
+    "noAccount": "Аккаунтыңыз жоқ па? Тіркеліңіз",
+    "hasAccount": "Аккаунтыңыз бар ма? Кіріңіз",
+    "loginFailed": "Кіру сәтсіз аяқталды",
+    "registerFailed": "Тіркелу сәтсіз аяқталды",
+    "fieldsRequired": "Барлық өрістер толтырылуы керек",
+    "passwordsMatch": "Құпия сөздер сәйкес келмейді",
+    "enterEmailPassword": "Электрондық пошта мен құпия сөзді енгізіңіз"
+  },
+  "map": {
+    "addComment": "Пікір қосу",
+    "commentPlaceholder": "Бұл орын туралы не айтқыңыз келеді?",
+    "noiseClassLabel": "Шу түрі (міндетті емес)",
+    "noiseClassPlaceholder": "мысалы, трафик, музыка",
+    "noiseLevelLabel": "Шу деңгейі (дБ, міндетті емес)",
+    "noiseLevelPlaceholder": "мысалы, 72.5",
+    "cancel": "Бас тарту",
+    "post": "Жіберу",
+    "commentAdded": "Пікір қосылды",
+    "commentAddedMessage": "Сіздің пікіріңіз жарияланды.",
+    "locationRequired": "Орынды анықтау қажет",
+    "locationRequiredMessage": "Пікір қоспас бұрын GPS сигналын күтіңіз.",
+    "youAreHere": "Сіз осындасыз",
+    "acquiring": "GPS сигналы алынуда…",
+    "locationNotAvailable": "Орын қолжетімсіз"
+  },
+  "notifications": {
+    "title": "Хабарландырулар",
+    "markAllRead": "Барлығын оқылды деп белгілеу",
+    "noNotifications": "Әзірге хабарландырулар жоқ",
+    "error": "Қате"
+  },
+  "gamification": {
+    "me": "Мен",
+    "leaderboard": "Көшбасшылар тақтасы",
+    "statistics": "Статистика",
+    "level": "Деңгей",
+    "points": "Ұпай",
+    "recordings": "Жазбалар",
+    "dayStreak": "Күн қатарынан",
+    "achievements": "Жетістіктер",
+    "noAchievements": "Әзірге жетістіктер жоқ",
+    "you": "Сіз",
+    "pts": "ұпай",
+    "rec": "жазба",
+    "leaderboardUnavailable": "Көшбасшылар тақтасы қолжетімсіз",
+    "noStatistics": "Статистика қолжетімсіз",
+    "cityOverview": "Қала бойынша шолу",
+    "byNoiseType": "Шу түрі бойынша",
+    "yourStats": "Сіздің статистикаңыз",
+    "yourNoiseMix": "Сіздің шу профиліңіз",
+    "healthAdvice": "Денсаулыққа кеңес",
+    "avgDb": "Орт. дБ",
+    "maxDb": "Макс. дБ",
+    "measurements": "Өлшемдер",
+    "contributors": "Қатысушылар"
+  },
+  "recorder": {
+    "title": "Мерзімді жазба",
+    "ready": "📍 Дайын",
+    "acquiring": "🔄 GPS алынуда…",
+    "noLocation": "⚠️ Орын жоқ",
+    "secondsUntil": "келесі жазбаға дейін секунд",
+    "recording": "🔴 Жазу…",
+    "start": "Бастау",
+    "stop": "Тоқтату",
+    "logsEmpty": "Мұнда журналдар пайда болады…",
+    "notificationTitle": "Мерзімді жазба",
+    "notificationBody": "Әр {seconds} секунд сайын жазба…",
+    "logPrepareFailed": "⚠️ Дайындау сәтсіз аяқталды: {message}",
+    "logNotReady": "⚠️ Жазғыш дайын емес — қайта дайындау әрекеті…",
+    "logReprepareFailed": "❌ Қайта дайындау сәтсіз аяқталды, цикл өткізілді",
+    "logRecordingFor": "▶ {duration} с жазу…",
+    "logLocationUnavailable": "⚠️ Орын қолжетімсіз {acquiring}",
+    "logRecorderStoppedUnexpectedly": "⚠️ Жазғыш күтпеген жерден тоқтады",
+    "logNoUri": "⚠️ Тоқтаудан кейін URI жоқ — жүктеу өткізілді",
+    "logNoLocationData": "❌ Орын туралы деректер жоқ, жүктеу өткізілді",
+    "logUploading": "📤 Жазба жүктелуде…",
+    "logUploaded": "✅ Жүктелді: ID {id}",
+    "logUploadFailed": "❌ Жүктеу сәтсіз аяқталды: {message}",
+    "logError": "❌ {message}"
+  },
+  "settings": {
+    "title": "Параметрлер",
+    "account": "Аккаунт",
+    "email": "Электрондық пошта",
+    "name": "Аты",
+    "notSignedIn": "Кірмеген",
+    "logout": "Шығу",
+    "logoutConfirm": "Шыққыңыз келетініне сенімдісіз бе?",
+    "cancel": "Бас тарту"
+  },
+  "tabs": {
+    "settings": "Параметрлер",
+    "recorder": "Жазғыш",
+    "map": "Карта",
+    "gamification": "Геймификация",
+    "notifications": "Хабарландырулар"
+  },
+  "achievements": {
+    "first_recording": {
+      "title": "Алғашқы қадам",
+      "description": "Алғашқы жазбаңызды жасаңыз"
+    },
+    "recordings_10": {
+      "title": "Белсенді",
+      "description": "10 жазба жасаңыз"
+    },
+    "recordings_50": {
+      "title": "Зерттеуші",
+      "description": "50 жазба жасаңыз"
+    },
+    "recordings_100": {
+      "title": "Сарапшы",
+      "description": "100 жазба жасаңыз"
+    },
+    "recordings_500": {
+      "title": "Аңыз",
+      "description": "500 жазба жасаңыз"
+    },
+    "quiet_finder": {
+      "title": "Тыныштық пен тыныштық",
+      "description": "40 дБА-дан төмен орын табыңыз"
+    },
+    "loud_discoverer": {
+      "title": "Ыстық нүкте",
+      "description": "85 дБА-дан жоғары орын табыңыз"
+    },
+    "night_owl": {
+      "title": "Түнгі күзет",
+      "description": "23:00 мен 5:00 аралығында жазба жасаңыз"
+    },
+    "early_bird": {
+      "title": "Ерте тұрған",
+      "description": "5:00 мен 7:00 аралығында жазба жасаңыз"
+    },
+    "streak_7": {
+      "title": "Апта қатарынан",
+      "description": "7 күн бойы дыбыс жазыңыз"
+    },
+    "streak_30": {
+      "title": "Ай қатарынан",
+      "description": "30 күн бойы дыбыс жазыңыз"
+    }
+  }
+}
