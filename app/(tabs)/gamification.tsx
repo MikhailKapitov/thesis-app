@@ -116,7 +116,6 @@ export default function GamificationScreen() {
 
   const renderLeader = ({ item }: { item: LeaderboardEntry }) => {
     const isYou = profile?.userId === item.userId;
-    const cardColor = item.rank === 1 ? '#fbbf24' : item.rank === 2 ? '#c0c0c0' : item.rank === 3 ? '#cd7f32' : undefined;
     return (
       <View style={[
         styles.leaderCard,
