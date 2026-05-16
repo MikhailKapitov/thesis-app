@@ -1,11 +1,9 @@
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "expo-router";
 import { useThemeColors } from "@/hooks/useThemeColors";
 
 export default function SettingsScreen() {
   const { user, logout } = useAuth();
-  const router = useRouter();
   const colors = useThemeColors();
 
   const handleLogout = async () => {
