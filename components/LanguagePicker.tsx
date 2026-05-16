@@ -10,9 +10,9 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useThemeColors } from '@/hooks/useThemeColors';
 
 const languages = [
-  { code: 'en', label: 'EN' },
-  { code: 'ru', label: 'RU' },
-  { code: 'kz', label: 'KZ' },
+  { code: 'en', label: 'EN', flag: '🇬🇧' },
+  { code: 'ru', label: 'RU', flag: '🇷🇺' },
+  { code: 'kz', label: 'KZ', flag: '🇰🇿' },
 ];
 
 export default function LanguagePicker() {
@@ -30,7 +30,7 @@ export default function LanguagePicker() {
         activeOpacity={0.7}
       >
         <Text style={[styles.text, { color: colors.textColor }]}>
-          🌐 {current.label}
+          {current.flag} {current.label}
         </Text>
       </TouchableOpacity>
 
@@ -47,8 +47,7 @@ export default function LanguagePicker() {
                 }}
               >
                 <Text style={[styles.optionText, { color: colors.textColor }]}>
-                  {lang.label}
-                  {locale === lang.code ? ' ✓' : ''}
+                  {lang.flag} {lang.label}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -70,11 +69,13 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 8,
-    minWidth: 70,
+    minWidth: 80,
+    justifyContent: 'center',
   },
   text: {
     fontSize: 13,
     fontWeight: '500',
+    textAlign: 'center',
   },
   overlay: {
     position: 'absolute',
