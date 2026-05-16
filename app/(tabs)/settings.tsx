@@ -1,10 +1,12 @@
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "expo-router";
+import { useThemeColors } from "@/hooks/useThemeColors";
 
 export default function SettingsScreen() {
   const { user, logout } = useAuth();
   const router = useRouter();
+  const colors = useThemeColors();
 
   const handleLogout = async () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
@@ -14,23 +16,22 @@ export default function SettingsScreen() {
         style: "destructive",
         onPress: async () => {
           await logout();
-          // The AuthGuard will automatically redirect to login
         },
       },
     ]);
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Settings</Text>
+    <View style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
+      <Text style={[styles.title, { color: colors.textColor }]}>Settings</Text>
 
       <View style={styles.section}>
-        <Text style={styles.label}>Account</Text>
-        <View style={styles.card}>
-          <Text style={styles.userInfo}>
+        <Text style={[styles.label, { color: colors.isDark ? '#888' : '#6b7280' }]}>Account</Text>
+        <View style={[styles.card, { backgroundColor: colors.inputBg }]}>
+          <Text style={[styles.userInfo, { color: colors.textColor }]}>
             Email: {user?.email || "Not signed in"}
           </Text>
-          <Text style={styles.userInfo}>Name: {user?.displayName || "—"}</Text>
+          <Text style={[styles.userInfo, { color: colors.textColor }]}>Name: {user?.displayName || "—"}</Text>
         </View>
       </View>
 
@@ -44,14 +45,12 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0f0f0f",
     padding: 20,
     paddingTop: 60,
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#fff",
     marginBottom: 24,
   },
   section: {
@@ -59,18 +58,15 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    color: "#888",
     marginBottom: 8,
     textTransform: "uppercase",
     letterSpacing: 1,
   },
   card: {
-    backgroundColor: "#1a1a1a",
     borderRadius: 12,
     padding: 16,
   },
   userInfo: {
-    color: "#fff",
     fontSize: 16,
     marginBottom: 8,
   },

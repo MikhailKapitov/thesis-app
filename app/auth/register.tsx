@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useAuth } from "@/context/AuthContext";
 import { Link } from "expo-router";
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 export default function RegisterScreen() {
   const [email, setEmail] = useState("");
@@ -21,8 +22,9 @@ export default function RegisterScreen() {
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
 
-  const handleRegister = async () => {
+  const { backgroundColor, textColor, inputBg, placeholderColor, linkColor } = useThemeColors();
 
+  const handleRegister = async () => {
     if (!email || !displayName || !password || !confirmPassword) {
       Alert.alert("Error", "All fields are required");
       return;
@@ -34,7 +36,6 @@ export default function RegisterScreen() {
     setLoading(true);
     try {
       await register(email, password, displayName);
-      // Navigation happens automatically
     } catch (error: any) {
       Alert.alert("Registration Failed", error.message);
     } finally {
@@ -44,7 +45,7 @@ export default function RegisterScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.keyboardView}
+      style={[styles.keyboardView, { backgroundColor }]}
       behavior={Platform.OS === "ios" ? "padding" : "padding"}
     >
       <ScrollView
@@ -52,36 +53,36 @@ export default function RegisterScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.title}>Register</Text>
+        <Text style={[styles.title, { color: textColor }]}>Register</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: inputBg, color: textColor }]}
           placeholder="Display Name"
-          placeholderTextColor="#888"
+          placeholderTextColor={placeholderColor}
           value={displayName}
           onChangeText={setDisplayName}
           autoCapitalize="words"
         />
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: inputBg, color: textColor }]}
           placeholder="Email"
-          placeholderTextColor="#888"
+          placeholderTextColor={placeholderColor}
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
           keyboardType="email-address"
         />
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: inputBg, color: textColor }]}
           placeholder="Password"
-          placeholderTextColor="#888"
+          placeholderTextColor={placeholderColor}
           value={password}
           onChangeText={setPassword}
           secureTextEntry
         />
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: inputBg, color: textColor }]}
           placeholder="Confirm Password"
-          placeholderTextColor="#888"
+          placeholderTextColor={placeholderColor}
           value={confirmPassword}
           onChangeText={setConfirmPassword}
           secureTextEntry
@@ -97,7 +98,7 @@ export default function RegisterScreen() {
             <Text style={styles.buttonText}>Register</Text>
           )}
         </TouchableOpacity>
-        <Link href="/auth/login" style={styles.link}>
+        <Link href="/auth/login" style={[styles.link, { color: linkColor }]}>
           Already have an account? Login
         </Link>
       </ScrollView>
@@ -106,22 +107,13 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#0f0f0f",
-    padding: 24,
-    justifyContent: "center",
-  },
   title: {
     fontSize: 32,
     fontWeight: "bold",
-    color: "#fff",
     marginBottom: 32,
     textAlign: "center",
   },
   input: {
-    backgroundColor: "#1a1a1a",
-    color: "#fff",
     padding: 16,
     borderRadius: 8,
     marginBottom: 16,
@@ -140,14 +132,12 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   link: {
-    color: "#2563eb",
     textAlign: "center",
     marginTop: 20,
     fontSize: 16,
   },
   keyboardView: {
     flex: 1,
-    backgroundColor: "#0f0f0f",
   },
   scrollContent: {
     flex: 1,

@@ -16,6 +16,7 @@ import notifee, {
 import { AudioModule, RecordingPresets, useAudioRecorder, useAudioRecorderState } from "expo-audio";
 import { useLocation } from "@/context/LocationContext";
 import { api } from "@/services/api";
+import { useThemeColors } from "@/hooks/useThemeColors";
 
 const COUNTDOWN_SEC = 5;
 const RECORD_DURATION_MS = 2000;
@@ -25,7 +26,7 @@ export default function RecorderScreen() {
   const [isRunning, setIsRunning] = useState(false);
   const [countdown, setCountdown] = useState(COUNTDOWN_SEC);
   const [logs, setLogs] = useState<string[]>([]);
-  const [currentMetering, setCurrentMetering] = useState(-160); // -160 dB = silence
+  const [currentMetering, setCurrentMetering] = useState(-160);
 
   const isRecordingRef = useRef(false);
   const isPreparedRef = useRef(false);
@@ -36,6 +37,7 @@ export default function RecorderScreen() {
   const recorderStatus = useAudioRecorderState(audioRecorder);
 
   const { lastLocation, isAcquiring } = useLocation();
+  const colors = useThemeColors();
 
   const log = useCallback((msg: string) => {
     setLogs((prev) => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev]);
@@ -82,7 +84,6 @@ export default function RecorderScreen() {
 
       const uri = audioRecorder.uri;
 
-      // Re‑prepare for the next cycle
       prepare();
 
       if (!uri) {
@@ -90,7 +91,6 @@ export default function RecorderScreen() {
         return;
       }
 
-      // Build metadata for upload
       const lat = location?.coords.latitude;
       const lon = location?.coords.longitude;
       if (lat == null || lon == null) {
@@ -127,7 +127,6 @@ export default function RecorderScreen() {
   useEffect(() => {
     (async () => {
       await AudioModule.requestRecordingPermissionsAsync();
-      // MediaLibrary permissions no longer needed
       if (Platform.OS === "android" && Platform.Version >= 33) {
         await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
@@ -161,7 +160,6 @@ export default function RecorderScreen() {
   useEffect(() => {
     if (!isRunning) return;
     let interval: ReturnType<typeof setInterval>;
-    // Start polling when a recording is actually going on
     if (recorderStatus.isRecording) {
       interval = setInterval(async () => {
         try {
@@ -170,7 +168,7 @@ export default function RecorderScreen() {
             setCurrentMetering(status.metering);
           }
         } catch {}
-      }, 50); // Update delay in ms
+      }, 50);
     }
     return () => {
       if (interval) clearInterval(interval);
@@ -208,25 +206,23 @@ export default function RecorderScreen() {
       : "⚠️ No location";
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Periodic Recorder</Text>
-      <Text style={styles.locationStatus}>{locationStatus}</Text>
+    <View style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
+      <Text style={[styles.title, { color: colors.textColor }]}>Periodic Recorder</Text>
+      <Text style={[styles.locationStatus, { color: colors.isDark ? '#aaa' : '#6b7280' }]}>{locationStatus}</Text>
 
       {isRunning && (
         <View style={styles.timerBox}>
-          <Text style={styles.timerNumber}>{countdown}</Text>
-          <Text style={styles.timerLabel}>
+          <Text style={[styles.timerNumber, { color: colors.textColor }]}>{countdown}</Text>
+          <Text style={[styles.timerLabel, { color: colors.isDark ? '#888' : '#6b7280' }]}>
             {isRecordingRef.current ? (
-              // Metering bar during recording
               <View style={{ alignItems: 'center' }}>
-                <Text style={{ color: '#fff' }}>🔴 Recording…</Text>
-                <View style={styles.meterContainer}>
+                <Text style={{ color: colors.textColor }}>🔴 Recording…</Text>
+                <View style={[styles.meterContainer, { backgroundColor: colors.isDark ? '#333' : '#e5e7eb' }]}>
                   <View style={[styles.meterBar, {
-                    width: `${Math.min(100, Math.max(0, (currentMetering + 60) * 2))}%`, // maps -60..-10 dB to 0..100%
+                    width: `${Math.min(100, Math.max(0, (currentMetering + 60) * 2))}%`,
                     backgroundColor: currentMetering > -20 ? '#dc2626' : currentMetering > -40 ? '#f59e0b' : '#22c55e'
                   }]} />
                 </View>
-                {/* <Text style={styles.meterText}>{currentMetering.toFixed(1)} dB</Text> */}
               </View>
             ) : (
               "seconds until next recording"
@@ -236,21 +232,21 @@ export default function RecorderScreen() {
       )}
 
       <TouchableOpacity
-        style={[styles.btn, isRunning && styles.btnStop]}
+        style={[styles.btn, isRunning && styles.btnStop, { backgroundColor: isRunning ? '#dc2626' : colors.linkColor }]}
         onPress={toggle}
       >
         <Text style={styles.btnText}>{isRunning ? "Stop" : "Start"}</Text>
       </TouchableOpacity>
 
       <ScrollView
-        style={styles.logBox}
+        style={[styles.logBox, { backgroundColor: colors.inputBg }]}
         contentContainerStyle={styles.logContent}
       >
         {logs.length === 0 ? (
-          <Text style={styles.logEmpty}>Logs will appear here…</Text>
+          <Text style={[styles.logEmpty, { color: colors.isDark ? '#444' : '#9ca3af' }]}>Logs will appear here…</Text>
         ) : (
           logs.map((l, i) => (
-            <Text key={i} style={styles.logLine}>
+            <Text key={i} style={[styles.logLine, { color: colors.isDark ? '#ccc' : '#4b5563' }]}>
               {l}
             </Text>
           ))
@@ -266,12 +262,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: 60,
     paddingHorizontal: 24,
-    backgroundColor: "#0f0f0f",
   },
-  title: { fontSize: 22, fontWeight: "700", color: "#fff", marginBottom: 8 },
+  title: { fontSize: 22, fontWeight: "700", marginBottom: 8 },
   locationStatus: {
     fontSize: 13,
-    color: "#aaa",
     marginBottom: 24,
     fontFamily: "monospace",
   },
@@ -279,44 +273,34 @@ const styles = StyleSheet.create({
   timerNumber: {
     fontSize: 80,
     fontWeight: "200",
-    color: "#fff",
     lineHeight: 88,
   },
-  timerLabel: { fontSize: 14, color: "#888", marginTop: 4 },
+  timerLabel: { fontSize: 14, marginTop: 4 },
   btn: {
     paddingVertical: 16,
     paddingHorizontal: 56,
     borderRadius: 50,
-    backgroundColor: "#2563eb",
     marginBottom: 32,
   },
-  btnStop: { backgroundColor: "#dc2626" },
   btnText: { color: "#fff", fontSize: 18, fontWeight: "600" },
   logBox: {
     width: "100%",
     flex: 1,
-    backgroundColor: "#1a1a1a",
     borderRadius: 12,
     padding: 12,
   },
   logContent: { gap: 4 },
-  logLine: { color: "#ccc", fontFamily: "monospace", fontSize: 12 },
-  logEmpty: { color: "#444", fontSize: 13, textAlign: "center", marginTop: 16 },
+  logLine: { fontFamily: "monospace", fontSize: 12 },
+  logEmpty: { fontSize: 13, textAlign: "center", marginTop: 16 },
   meterContainer: {
-  width: 100,
-  height: 8,
-  backgroundColor: '#333',
-  borderRadius: 4,
-  marginVertical: 4,
-  overflow: 'hidden',
+    width: 100,
+    height: 8,
+    borderRadius: 4,
+    marginVertical: 4,
+    overflow: 'hidden',
   },
   meterBar: {
     height: '100%',
     borderRadius: 4,
-  },
-  meterText: {
-    fontSize: 11,
-    color: '#aaa',
-    marginTop: 2,
   },
 });

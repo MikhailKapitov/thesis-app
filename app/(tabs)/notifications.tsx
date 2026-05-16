@@ -12,6 +12,7 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { api } from '@/services/api';
 import { useNotificationContext } from '@/context/NotificationContext';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 interface Notification {
   id: string;
@@ -37,6 +38,7 @@ export default function NotificationsScreen() {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const { refreshUnreadCount } = useNotificationContext();
+  const colors = useThemeColors();
 
   const fetchNotifications = useCallback(async (p = 0) => {
     setLoading(true);
@@ -59,7 +61,6 @@ export default function NotificationsScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      // Refresh list and unread count when screen is focused
       fetchNotifications(0);
       refreshUnreadCount();
     }, [fetchNotifications, refreshUnreadCount])
@@ -68,7 +69,6 @@ export default function NotificationsScreen() {
   const handleMarkRead = async (id: string) => {
     try {
       await api.markNotificationRead(id);
-      // Update local state
       setNotifications(prev =>
         prev.map(n => n.id === id ? { ...n, read: true } : n)
       );
@@ -81,7 +81,6 @@ export default function NotificationsScreen() {
   const handleMarkAllRead = async () => {
     try {
       await api.markAllNotificationsRead();
-      // Mark all local items as read
       setNotifications(prev =>
         prev.map(n => ({ ...n, read: true }))
       );
@@ -99,16 +98,23 @@ export default function NotificationsScreen() {
 
   const renderItem = ({ item }: { item: Notification }) => (
     <TouchableOpacity
-      style={[styles.notifItem, item.read && styles.notifRead]}
+      style={[
+        styles.notifItem,
+        item.read && styles.notifRead,
+        {
+          backgroundColor: colors.cardBg || colors.inputBg,
+          borderLeftColor: item.read ? '#555' : colors.linkColor,
+        },
+      ]}
       onPress={() => !item.read && handleMarkRead(item.id)}
     >
       <View style={styles.notifHeader}>
         <Text style={styles.notifIcon}>{typeIcons[item.type] || '📌'}</Text>
-        <Text style={styles.notifTitle}>{item.title}</Text>
+        <Text style={[styles.notifTitle, { color: colors.textColor }]}>{item.title}</Text>
       </View>
-      <Text style={styles.notifMessage}>{item.message}</Text>
+      <Text style={[styles.notifMessage, { color: colors.isDark ? '#ccc' : '#4b5563' }]}>{item.message}</Text>
       <View style={styles.notifFooter}>
-        <Text style={styles.notifTime}>
+        <Text style={[styles.notifTime, { color: colors.isDark ? '#888' : '#6b7280' }]}>
           {new Date(item.createdAt).toLocaleString()}
         </Text>
         {!item.read && <Text style={styles.unreadDot}>🔵</Text>}
@@ -117,11 +123,11 @@ export default function NotificationsScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>Notifications</Text>
+        <Text style={[styles.title, { color: colors.textColor }]}>Notifications</Text>
         <TouchableOpacity onPress={handleMarkAllRead}>
-          <Text style={styles.markAllText}>Mark all read</Text>
+          <Text style={[styles.markAllText, { color: colors.linkColor }]}>Mark all read</Text>
         </TouchableOpacity>
       </View>
 
@@ -131,7 +137,7 @@ export default function NotificationsScreen() {
         keyExtractor={item => item.id}
         onEndReached={loadMore}
         onEndReachedThreshold={0.5}
-        ListFooterComponent={loading ? <ActivityIndicator size="small" color="#2563eb" /> : null}
+        ListFooterComponent={loading ? <ActivityIndicator size="small" color={colors.linkColor} /> : null}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -139,11 +145,12 @@ export default function NotificationsScreen() {
               setRefreshing(true);
               fetchNotifications(0);
             }}
+            tintColor={colors.linkColor}
           />
         }
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={
-          !loading ? <Text style={styles.emptyText}>No notifications yet</Text> : null
+          !loading ? <Text style={[styles.emptyText, { color: colors.isDark ? '#555' : '#9ca3af' }]}>No notifications yet</Text> : null
         }
       />
     </View>
@@ -153,7 +160,6 @@ export default function NotificationsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f0f0f',
     paddingTop: 60,
     paddingHorizontal: 16,
   },
@@ -166,26 +172,21 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#fff',
   },
   markAllText: {
-    color: '#2563eb',
     fontSize: 14,
   },
   listContent: {
     paddingBottom: 20,
   },
   notifItem: {
-    backgroundColor: '#1a1a1a',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#2563eb',
   },
   notifRead: {
     opacity: 0.6,
-    borderLeftColor: '#555',
   },
   notifHeader: {
     flexDirection: 'row',
@@ -199,12 +200,10 @@ const styles = StyleSheet.create({
   notifTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#fff',
     flex: 1,
   },
   notifMessage: {
     fontSize: 14,
-    color: '#ccc',
     marginBottom: 8,
   },
   notifFooter: {
@@ -214,13 +213,11 @@ const styles = StyleSheet.create({
   },
   notifTime: {
     fontSize: 12,
-    color: '#888',
   },
   unreadDot: {
     fontSize: 12,
   },
   emptyText: {
-    color: '#555',
     textAlign: 'center',
     marginTop: 40,
     fontSize: 16,

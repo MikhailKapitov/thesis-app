@@ -9,12 +9,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-// import { Picker } from "@react-native-picker/picker";
 import { WebView } from "react-native-webview";
 import { MAP_HTML } from "@/constants/mapHtml";
 import { useLocation } from "@/context/LocationContext";
 import { useAuth } from "@/context/AuthContext";
 import { api } from "@/services/api";
+import { useThemeColors } from "@/hooks/useThemeColors";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://10.0.2.2:5000";
 
@@ -28,7 +28,8 @@ export default function MapScreen() {
   const [submittingComment, setSubmittingComment] = useState(false);
 
   const { lastLocation, isAcquiring } = useLocation();
-  const { user } = useAuth(); // needed to ensure user is logged in
+  const { user } = useAuth();
+  const colors = useThemeColors(); // access theme colours
 
   const finalHtml = MAP_HTML.replace(
     /const API_URL = ['"].*?['"];/,
@@ -86,10 +87,10 @@ export default function MapScreen() {
   const isLocationReady = lastLocation != null;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
       <WebView
         ref={webRef}
-        style={styles.map}
+        style={[styles.map, { backgroundColor: colors.backgroundColor }]}
         source={{ html: finalHtml }}
         originWhitelist={["*"]}
         javaScriptEnabled
@@ -100,7 +101,11 @@ export default function MapScreen() {
       {/* Add comment button – only visible if logged in */}
       {user && (
         <TouchableOpacity
-          style={[styles.commentBtn, !isLocationReady && styles.commentBtnDisabled]}
+          style={[
+            styles.commentBtn,
+            !isLocationReady && styles.commentBtnDisabled,
+            { backgroundColor: isLocationReady ? "#22c55e" : "#555" },
+          ]}
           onPress={() => {
             if (isLocationReady) setCommentModalVisible(true);
             else Alert.alert("Location required", "Wait for a GPS fix before adding a comment.");
@@ -131,13 +136,13 @@ export default function MapScreen() {
         onRequestClose={() => setCommentModalVisible(false)}
       >
         <View style={styles.modalBackdrop}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Add Comment</Text>
+          <View style={[styles.modalContent, { backgroundColor: colors.cardBg || colors.inputBg }]}>
+            <Text style={[styles.modalTitle, { color: colors.textColor }]}>Add Comment</Text>
 
             <TextInput
-              style={styles.commentInput}
+              style={[styles.commentInput, { backgroundColor: colors.inputBg, color: colors.textColor }]}
               placeholder="What do you want to say about this location?"
-              placeholderTextColor="#888"
+              placeholderTextColor={colors.placeholderColor}
               value={commentText}
               onChangeText={setCommentText}
               multiline
@@ -145,38 +150,20 @@ export default function MapScreen() {
               maxLength={500}
             />
 
-            <Text style={styles.label}>Noise class (optional)</Text>
+            <Text style={[styles.label, { color: colors.placeholderColor }]}>Noise class (optional)</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: colors.inputBg, color: colors.textColor }]}
               placeholder="e.g. traffic, music"
-              placeholderTextColor="#888"
+              placeholderTextColor={colors.placeholderColor}
               value={commentNoiseClass}
               onChangeText={setCommentNoiseClass}
             />
 
-            {/* <View style={styles.pickerWrapper}>
-              <Picker
-                selectedValue={commentNoiseClass}
-                onValueChange={setCommentNoiseClass}
-                style={styles.picker}
-                dropdownIconColor="#fff"
-              >
-                <Picker.Item label="None" value="" />
-                <Picker.Item label="Traffic" value="traffic" />
-                <Picker.Item label="Construction" value="construction" />
-                <Picker.Item label="Voices" value="voices" />
-                <Picker.Item label="Music" value="music" />
-                <Picker.Item label="Nature" value="nature" />
-                <Picker.Item label="Siren" value="siren" />
-                <Picker.Item label="Industrial" value="industrial" />
-              </Picker>
-            </View> */}
-
-            <Text style={styles.label}>Noise level (dB, optional)</Text>
+            <Text style={[styles.label, { color: colors.placeholderColor }]}>Noise level (dB, optional)</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: colors.inputBg, color: colors.textColor }]}
               placeholder="e.g. 72.5"
-              placeholderTextColor="#888"
+              placeholderTextColor={colors.placeholderColor}
               value={commentNoiseLevel}
               onChangeText={setCommentNoiseLevel}
               keyboardType="numeric"
@@ -184,13 +171,17 @@ export default function MapScreen() {
 
             <View style={styles.modalButtons}>
               <TouchableOpacity
-                style={styles.cancelBtn}
+                style={[styles.cancelBtn, { backgroundColor: colors.isDark ? "#444" : "#d1d5db" }]}
                 onPress={() => setCommentModalVisible(false)}
               >
-                <Text style={styles.cancelBtnText}>Cancel</Text>
+                <Text style={[styles.cancelBtnText, { color: colors.textColor }]}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.submitBtn, !commentText.trim() && styles.disabledBtn]}
+                style={[
+                  styles.submitBtn,
+                  !commentText.trim() && styles.disabledBtn,
+                  { backgroundColor: commentText.trim() ? "#22c55e" : "#555" },
+                ]}
                 onPress={handleAddComment}
                 disabled={!commentText.trim() || submittingComment}
               >
@@ -209,18 +200,17 @@ export default function MapScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0f0f0f" },
-  map: { flex: 1, backgroundColor: "#0f0f0f" },
+  container: { flex: 1 },
+  map: { flex: 1 },
 
   // ── Floating buttons ──
   commentBtn: {
     position: "absolute",
-    bottom: 106,   // right above the locate button
+    bottom: 106,
     right: 20,
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: "#22c55e",
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000",
@@ -229,7 +219,7 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   commentBtnDisabled: {
-    backgroundColor: "#555",
+    opacity: 0.6,
   },
   commentBtnText: {
     fontSize: 24,
@@ -263,19 +253,15 @@ const styles = StyleSheet.create({
   modalContent: {
     width: "100%",
     maxWidth: 400,
-    backgroundColor: "#1a1a1a",
     borderRadius: 16,
     padding: 20,
   },
   modalTitle: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#fff",
     marginBottom: 16,
   },
   commentInput: {
-    backgroundColor: "#222",
-    color: "#fff",
     borderRadius: 8,
     padding: 12,
     fontSize: 15,
@@ -284,25 +270,14 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   label: {
-    color: "#aaa",
     fontSize: 14,
     marginBottom: 6,
   },
   input: {
-    backgroundColor: "#222",
-    color: "#fff",
     borderRadius: 8,
     padding: 12,
     fontSize: 15,
     marginBottom: 12,
-  },
-  pickerWrapper: {
-    backgroundColor: "#222",
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  picker: {
-    color: "#fff",
   },
   modalButtons: {
     flexDirection: "row",
@@ -314,19 +289,17 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
-    backgroundColor: "#444",
   },
   cancelBtnText: {
-    color: "#fff",
+    fontWeight: "500",
   },
   submitBtn: {
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
-    backgroundColor: "#22c55e",
   },
   disabledBtn: {
-    backgroundColor: "#555",
+    opacity: 0.6,
   },
   submitBtnText: {
     color: "#fff",

@@ -11,6 +11,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { api } from '@/services/api';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 // ---------- Helper ----------
 const formatDba = (value: number | null | undefined) =>
@@ -72,6 +73,7 @@ export default function GamificationScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<ActiveTab>('profile');
+  const colors = useThemeColors();
 
   const fetchData = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -101,37 +103,39 @@ export default function GamificationScreen() {
 
   // ---------- Renderers ----------
   const renderAchievement = ({ item }: { item: Achievement }) => (
-    <View style={styles.achievementCard}>
+    <View style={[styles.achievementCard, { backgroundColor: colors.cardBg || colors.inputBg, borderLeftColor: '#fbbf24' }]}>
       <View style={styles.achievementTitleRow}>
-        <Text style={styles.achievementTitle}>
+        <Text style={[styles.achievementTitle, { color: colors.textColor }]}>
           🏅 {item.title} <Text style={styles.achievementPoints}>+{item.pointsAwarded} pts</Text>
         </Text>
       </View>
-      <Text style={styles.achievementDesc}>{item.description}</Text>
-      <Text style={styles.achievementDate}>{new Date(item.unlockedAt).toLocaleDateString()}</Text>
+      <Text style={[styles.achievementDesc, { color: colors.isDark ? '#aaa' : '#6b7280' }]}>{item.description}</Text>
+      <Text style={[styles.achievementDate, { color: colors.isDark ? '#666' : '#9ca3af' }]}>{new Date(item.unlockedAt).toLocaleDateString()}</Text>
     </View>
   );
 
   const renderLeader = ({ item }: { item: LeaderboardEntry }) => {
     const isYou = profile?.userId === item.userId;
+    const cardColor = item.rank === 1 ? '#fbbf24' : item.rank === 2 ? '#c0c0c0' : item.rank === 3 ? '#cd7f32' : undefined;
     return (
       <View style={[
         styles.leaderCard,
-        item.rank === 1 && styles.leaderTop,
-        item.rank === 2 && styles.leaderSecond,
-        item.rank === 3 && styles.leaderThird,
-        isYou && styles.leaderYou,
+        { backgroundColor: colors.cardBg || colors.inputBg },
+        item.rank === 1 && { borderLeftColor: '#fbbf24' },
+        item.rank === 2 && { borderLeftColor: '#c0c0c0' },
+        item.rank === 3 && { borderLeftColor: '#cd7f32' },
+        isYou && { borderLeftColor: colors.linkColor },
       ]}>
-        <View style={styles.rankBadge}>
-          <Text style={styles.rankText}>{item.rank}</Text>
+        <View style={[styles.rankBadge, { backgroundColor: colors.isDark ? '#333' : '#e5e7eb' }]}>
+          <Text style={[styles.rankText, { color: colors.textColor }]}>{item.rank}</Text>
         </View>
         <View style={styles.leaderInfo}>
-          <Text style={styles.leaderName} numberOfLines={1}>
+          <Text style={[styles.leaderName, { color: colors.textColor }]} numberOfLines={1}>
             {isYou ? 'You' : `${item.userId.slice(0, 8)}...`}
           </Text>
-          <Text style={styles.leaderStats}>{item.totalPoints} pts · Level {item.level}</Text>
+          <Text style={[styles.leaderStats, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>{item.totalPoints} pts · Level {item.level}</Text>
         </View>
-        <Text style={styles.leaderRecordings}>{item.totalRecordings} rec</Text>
+        <Text style={[styles.leaderRecordings, { color: colors.linkColor }]}>{item.totalRecordings} rec</Text>
       </View>
     );
   };
@@ -141,7 +145,7 @@ export default function GamificationScreen() {
     if (!cityStats || !myStats) {
       return (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No statistics available</Text>
+          <Text style={[styles.emptyText, { color: colors.isDark ? '#555' : '#9ca3af' }]}>No statistics available</Text>
         </View>
       );
     }
@@ -151,76 +155,76 @@ export default function GamificationScreen() {
         style={styles.scrollArea}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={() => fetchData(true)} tintColor="#2563eb" />
+          <RefreshControl refreshing={refreshing} onRefresh={() => fetchData(true)} tintColor={colors.linkColor} />
         }
       >
         {/* City Statistics */}
-        <Text style={styles.sectionTitle}>City Overview</Text>
+        <Text style={[styles.sectionTitle, { color: colors.textColor }]}>City Overview</Text>
         <View style={styles.statsRow}>
           <View style={styles.statCell}>
-            <Text style={styles.statValue}>{formatDba(cityStats.avgNoiseLevelDba)}</Text>
-            <Text style={styles.statLabel}>Avg. dB</Text>
+            <Text style={[styles.statValue, { color: colors.textColor }]}>{formatDba(cityStats.avgNoiseLevelDba)}</Text>
+            <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>Avg. dB</Text>
           </View>
           <View style={styles.statCell}>
-            <Text style={styles.statValue}>{formatDba(cityStats.maxNoiseLevelDba)}</Text>
-            <Text style={styles.statLabel}>Max dB</Text>
+            <Text style={[styles.statValue, { color: colors.textColor }]}>{formatDba(cityStats.maxNoiseLevelDba)}</Text>
+            <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>Max dB</Text>
           </View>
           <View style={styles.statCell}>
-            <Text style={styles.statValue}>{cityStats.totalMeasurements}</Text>
-            <Text style={styles.statLabel}>Measurements</Text>
+            <Text style={[styles.statValue, { color: colors.textColor }]}>{cityStats.totalMeasurements}</Text>
+            <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>Measurements</Text>
           </View>
           <View style={styles.statCell}>
-            <Text style={styles.statValue}>{cityStats.totalContributors}</Text>
-            <Text style={styles.statLabel}>Contributors</Text>
+            <Text style={[styles.statValue, { color: colors.textColor }]}>{cityStats.totalContributors}</Text>
+            <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>Contributors</Text>
           </View>
         </View>
 
         {/* Noise Class Breakdown */}
-        <Text style={styles.subSectionTitle}>By Noise Type</Text>
+        <Text style={[styles.subSectionTitle, { color: colors.isDark ? '#ccc' : '#4b5563' }]}>By Noise Type</Text>
         {Object.entries(cityStats.measurementsByNoiseClass ?? {}).map(([cls, count]) => (
           <View key={cls} style={styles.classRow}>
-            <Text style={styles.className}>{cls}</Text>
-            <View style={styles.classBarContainer}>
+            <Text style={[styles.className, { color: colors.isDark ? '#ccc' : '#4b5563' }]}>{cls}</Text>
+            <View style={[styles.classBarContainer, { backgroundColor: colors.isDark ? '#333' : '#e5e7eb' }]}>
               <View style={[
                 styles.classBar,
-                { width: `${Math.min(100, (count / cityStats.totalMeasurements) * 100)}%` as any }
+                { width: `${Math.min(100, (count / cityStats.totalMeasurements) * 100)}%` as any, backgroundColor: colors.linkColor }
               ]} />
             </View>
-            <Text style={styles.classCount}>{count}</Text>
+            <Text style={[styles.classCount, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>{count}</Text>
           </View>
         ))}
 
         {/* Personal Statistics */}
-        <Text style={[styles.sectionTitle, { marginTop: 24 }]}>Your Stats</Text>
+        <Text style={[styles.sectionTitle, { color: colors.textColor, marginTop: 24 }]}>Your Stats</Text>
         <View style={styles.statsRow}>
           <View style={styles.statCell}>
-            <Text style={styles.statValue}>{myStats.totalRecordings}</Text>
-            <Text style={styles.statLabel}>Recordings</Text>
+            <Text style={[styles.statValue, { color: colors.textColor }]}>{myStats.totalRecordings}</Text>
+            <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>Recordings</Text>
           </View>
           <View style={styles.statCell}>
-            <Text style={styles.statValue}>{formatDba(myStats.avgExposureDba)}</Text>
-            <Text style={styles.statLabel}>Avg. dB</Text>
+            <Text style={[styles.statValue, { color: colors.textColor }]}>{formatDba(myStats.avgExposureDba)}</Text>
+            <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>Avg. dB</Text>
           </View>
           <View style={styles.statCell}>
-            <Text style={styles.statValue}>{formatDba(myStats.maxExposureDba)}</Text>
-            <Text style={styles.statLabel}>Max dB</Text>
+            <Text style={[styles.statValue, { color: colors.textColor }]}>{formatDba(myStats.maxExposureDba)}</Text>
+            <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>Max dB</Text>
           </View>
         </View>
 
         {/* Personal Noise Classes */}
         {Object.keys(myStats.recordingsByNoiseClass ?? {}).length > 0 && (
           <>
-            <Text style={styles.subSectionTitle}>Your Noise Mix</Text>
+            <Text style={[styles.subSectionTitle, { color: colors.isDark ? '#ccc' : '#4b5563' }]}>Your Noise Mix</Text>
             {Object.entries(myStats.recordingsByNoiseClass ?? {}).map(([cls, count]) => (
               <View key={cls} style={styles.classRow}>
-                <Text style={styles.className}>{cls}</Text>
-                <View style={styles.classBarContainer}>
+                <Text style={[styles.className, { color: colors.isDark ? '#ccc' : '#4b5563' }]}>{cls}</Text>
+                <View style={[styles.classBarContainer, { backgroundColor: colors.isDark ? '#333' : '#e5e7eb' }]}>
                   <View style={[
                     styles.classBar,
-                    { width: `${Math.min(100, (count / myStats.totalRecordings) * 100)}%` as any }
+                    { width: `${Math.min(100, (count / myStats.totalRecordings) * 100)}%` as any, backgroundColor: colors.linkColor }
                   ]} />
                 </View>
-                <Text style={styles.classCount}>{count}</Text>
+                <Text style={[styles.classCount, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>{count}</Text>
               </View>
             ))}
           </>
@@ -228,9 +232,9 @@ export default function GamificationScreen() {
 
         {/* Recommendation */}
         {myStats.recommendation ? (
-          <View style={styles.recommendationBox}>
+          <View style={[styles.recommendationBox, { backgroundColor: colors.cardBg || colors.inputBg, borderLeftColor: '#f59e0b' }]}>
             <Text style={styles.recommendationTitle}>Health Advice</Text>
-            <Text style={styles.recommendationText}>{myStats.recommendation}</Text>
+            <Text style={[styles.recommendationText, { color: colors.isDark ? '#ddd' : '#374151' }]}>{myStats.recommendation}</Text>
           </View>
         ) : null}
       </ScrollView>
@@ -240,33 +244,33 @@ export default function GamificationScreen() {
   // ---------- Main view ----------
   if (loading && !profile) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#2563eb" />
+      <View style={[styles.centered, { backgroundColor: colors.backgroundColor }]}>
+        <ActivityIndicator size="large" color={colors.linkColor} />
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
       {/* Tab bar */}
-      <View style={styles.tabBar}>
+      <View style={[styles.tabBar, { backgroundColor: colors.inputBg }]}>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'profile' && styles.tabActive]}
+          style={[styles.tab, activeTab === 'profile' && { backgroundColor: colors.linkColor }]}
           onPress={() => setActiveTab('profile')}
         >
-          <Text style={styles.tabText}>Me</Text>
+          <Text style={[styles.tabText, { color: activeTab === 'profile' ? '#fff' : colors.textColor }]}>Me</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'leaderboard' && styles.tabActive]}
+          style={[styles.tab, activeTab === 'leaderboard' && { backgroundColor: colors.linkColor }]}
           onPress={() => setActiveTab('leaderboard')}
         >
-          <Text style={styles.tabText}>Leaderboard</Text>
+          <Text style={[styles.tabText, { color: activeTab === 'leaderboard' ? '#fff' : colors.textColor }]}>Leaderboard</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'statistics' && styles.tabActive]}
+          style={[styles.tab, activeTab === 'statistics' && { backgroundColor: colors.linkColor }]}
           onPress={() => setActiveTab('statistics')}
         >
-          <Text style={styles.tabText}>Statistics</Text>
+          <Text style={[styles.tabText, { color: activeTab === 'statistics' ? '#fff' : colors.textColor }]}>Statistics</Text>
         </TouchableOpacity>
       </View>
 
@@ -278,31 +282,31 @@ export default function GamificationScreen() {
           ListHeaderComponent={() => (
             <View>
               {profile && (
-                <View style={styles.profileCard}>
+                <View style={[styles.profileCard, { backgroundColor: colors.isDark ? '#1e293b' : '#f3f4f6' }]}>
                   <Text style={styles.levelText}>Level {profile.level}</Text>
                   <View style={styles.statsGrid}>
                     <View style={styles.statBox}>
-                      <Text style={styles.statNumber}>{profile.totalPoints}</Text>
-                      <Text style={styles.statLabel}>Points</Text>
+                      <Text style={[styles.statNumber, { color: colors.textColor }]}>{profile.totalPoints}</Text>
+                      <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>Points</Text>
                     </View>
                     <View style={styles.statBox}>
-                      <Text style={styles.statNumber}>{profile.totalRecordings}</Text>
-                      <Text style={styles.statLabel}>Recordings</Text>
+                      <Text style={[styles.statNumber, { color: colors.textColor }]}>{profile.totalRecordings}</Text>
+                      <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>Recordings</Text>
                     </View>
                     <View style={styles.statBox}>
-                      <Text style={styles.statNumber}>{profile.currentStreak}</Text>
-                      <Text style={styles.statLabel}>Day Streak</Text>
+                      <Text style={[styles.statNumber, { color: colors.textColor }]}>{profile.currentStreak}</Text>
+                      <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>Day Streak</Text>
                     </View>
                   </View>
                 </View>
               )}
-              <Text style={styles.sectionTitle}>Achievements</Text>
+              <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Achievements</Text>
             </View>
           )}
           contentContainerStyle={styles.scrollContent}
-          ListEmptyComponent={() => <Text style={styles.emptyText}>No achievements yet</Text>}
+          ListEmptyComponent={() => <Text style={[styles.emptyText, { color: colors.isDark ? '#555' : '#9ca3af' }]}>No achievements yet</Text>}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={() => fetchData(true)} tintColor="#2563eb" />
+            <RefreshControl refreshing={refreshing} onRefresh={() => fetchData(true)} tintColor={colors.linkColor} />
           }
         />
       ) : activeTab === 'leaderboard' ? (
@@ -311,9 +315,9 @@ export default function GamificationScreen() {
           keyExtractor={item => item.userId}
           renderItem={renderLeader}
           contentContainerStyle={styles.scrollContent}
-          ListEmptyComponent={() => <Text style={styles.emptyText}>Leaderboard unavailable</Text>}
+          ListEmptyComponent={() => <Text style={[styles.emptyText, { color: colors.isDark ? '#555' : '#9ca3af' }]}>Leaderboard unavailable</Text>}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={() => fetchData(true)} tintColor="#2563eb" />
+            <RefreshControl refreshing={refreshing} onRefresh={() => fetchData(true)} tintColor={colors.linkColor} />
           }
         />
       ) : (
@@ -323,21 +327,17 @@ export default function GamificationScreen() {
   );
 }
 
-// ---------- Styles (same as before) ----------
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f0f0f',
   },
   centered: {
     flex: 1,
-    backgroundColor: '#0f0f0f',
     justifyContent: 'center',
     alignItems: 'center',
   },
   tabBar: {
     flexDirection: 'row',
-    backgroundColor: '#1a1a1a',
     marginTop: 60,
     marginHorizontal: 16,
     borderRadius: 12,
@@ -350,15 +350,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 10,
   },
-  tabActive: {
-    backgroundColor: '#2563eb',
-  },
   tabText: {
-    color: '#fff',
     fontWeight: '600',
   },
   profileCard: {
-    backgroundColor: '#1e293b',
     borderRadius: 16,
     padding: 20,
     marginBottom: 20,
@@ -380,34 +375,28 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#fff',
   },
   statLabel: {
     fontSize: 13,
-    color: '#94a3b8',
     marginTop: 4,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#fff',
     marginBottom: 12,
     paddingLeft: 4,
   },
   subSectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#ccc',
     marginBottom: 8,
     marginTop: 8,
   },
   achievementCard: {
-    backgroundColor: '#1a1a1a',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#fbbf24',
   },
   achievementTitleRow: {
     flexDirection: 'row',
@@ -415,7 +404,6 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   achievementTitle: {
-    color: '#fff',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -424,49 +412,29 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   achievementDesc: {
-    color: '#aaa',
     fontSize: 13,
     marginBottom: 8,
   },
   achievementDate: {
-    color: '#666',
     fontSize: 12,
   },
   leaderCard: {
-    backgroundColor: '#1e293b',
     borderRadius: 12,
     padding: 12,
     marginBottom: 8,
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  leaderTop: {
     borderLeftWidth: 4,
-    borderLeftColor: '#fbbf24',
-  },
-  leaderSecond: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#c0c0c0',
-  },
-  leaderThird: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#cd7f32',
-  },
-  leaderYou: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#2563eb',
   },
   rankBadge: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#333',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
   },
   rankText: {
-    color: '#fff',
     fontWeight: '700',
     fontSize: 16,
   },
@@ -474,17 +442,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   leaderName: {
-    color: '#fff',
     fontSize: 15,
     fontWeight: '600',
   },
   leaderStats: {
-    color: '#94a3b8',
     fontSize: 13,
     marginTop: 2,
   },
   leaderRecordings: {
-    color: '#2563eb',
     fontSize: 14,
   },
   scrollContent: {
@@ -497,7 +462,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    color: '#555',
     textAlign: 'center',
     marginTop: 40,
     fontSize: 16,
@@ -517,7 +481,6 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#fff',
   },
   classRow: {
     flexDirection: 'row',
@@ -525,33 +488,27 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   className: {
-    color: '#ccc',
     width: 80,
   },
   classBarContainer: {
     flex: 1,
     height: 8,
-    backgroundColor: '#333',
     borderRadius: 4,
     marginHorizontal: 10,
   },
   classBar: {
     height: '100%',
-    backgroundColor: '#2563eb',
     borderRadius: 4,
   },
   classCount: {
-    color: '#94a3b8',
     width: 40,
     textAlign: 'right',
   },
   recommendationBox: {
-    backgroundColor: '#1e293b',
     borderRadius: 12,
     padding: 16,
     marginTop: 20,
     borderLeftWidth: 4,
-    borderLeftColor: '#f59e0b',
   },
   recommendationTitle: {
     color: '#f59e0b',
@@ -560,7 +517,6 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   recommendationText: {
-    color: '#ddd',
     fontSize: 14,
   },
 });
