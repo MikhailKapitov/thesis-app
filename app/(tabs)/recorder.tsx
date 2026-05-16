@@ -50,6 +50,11 @@ export default function RecorderScreen() {
       await audioRecorder.prepareToRecordAsync();
       isPreparedRef.current = true;
     } catch (e: any) {
+      // If the recorder is already prepared (e.g. after a Fast Refresh), treat it as ready instead of failing.
+      if (e?.message?.includes('already been prepared')) { // Yes, I hate this check.
+        isPreparedRef.current = true;
+        return;
+      }
       isPreparedRef.current = false;
       log(`⚠️ Prepare failed: ${e.message}`);
     }
