@@ -77,7 +77,7 @@ export default function LoginScreen() {
           )}
         </TouchableOpacity>
         <Link href="/auth/register" style={[styles.link, { color: linkColor }]}>
-          Don't have an account? Register
+          Don&apos;t have an account? Register
         </Link>
       </ScrollView>
     </KeyboardAvoidingView>
