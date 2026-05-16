@@ -20,7 +20,6 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://10.0.2.2:5000";
 
 export default function MapScreen() {
   const webRef = useRef<WebView>(null);
-  const [locating, setLocating] = useState(false);
   const [commentModalVisible, setCommentModalVisible] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [commentNoiseClass, setCommentNoiseClass] = useState("");
@@ -119,9 +118,9 @@ export default function MapScreen() {
       <TouchableOpacity
         style={styles.locateBtn}
         onPress={locateMe}
-        disabled={locating}
+        disabled={lastLocation == null}
       >
-        {locating ? (
+        {lastLocation == null ? (
           <ActivityIndicator size="small" color="#fff" />
         ) : (
           <Text style={styles.locateBtnText}>◎</Text>
