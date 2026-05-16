@@ -108,10 +108,10 @@ export default function GamificationScreen() {
     <View style={[styles.achievementCard, { backgroundColor: colors.cardBg || colors.inputBg, borderLeftColor: '#fbbf24' }]}>
       <View style={styles.achievementTitleRow}>
         <Text style={[styles.achievementTitle, { color: colors.textColor }]}>
-          🏅 {item.title} <Text style={styles.achievementPoints}>+{item.pointsAwarded} {t('gamification.pts')}</Text>
+          🏅 {t(`achievements.${item.code}.title`)} <Text style={styles.achievementPoints}>+{item.pointsAwarded} {t('gamification.pts')}</Text>
         </Text>
       </View>
-      <Text style={[styles.achievementDesc, { color: colors.isDark ? '#aaa' : '#6b7280' }]}>{item.description}</Text>
+      <Text style={[styles.achievementDesc, { color: colors.isDark ? '#aaa' : '#6b7280' }]}>{t(`achievements.${item.code}.description`)}</Text>
       <Text style={[styles.achievementDate, { color: colors.isDark ? '#666' : '#9ca3af' }]}>{new Date(item.unlockedAt).toLocaleDateString()}</Text>
     </View>
   );

@@ -105,5 +105,51 @@
     "map": "Map",
     "gamification": "Gamification",
     "notifications": "Notifications"
+  },
+  "achievements": {
+    "first_recording": {
+      "title": "First Step",
+      "description": "Make your first recording"
+    },
+    "recordings_10": {
+      "title": "Activist",
+      "description": "Make 10 recordings"
+    },
+    "recordings_50": {
+      "title": "Explorer",
+      "description": "Make 50 recordings"
+    },
+    "recordings_100": {
+      "title": "Expert",
+      "description": "Make 100 recordings"
+    },
+    "recordings_500": {
+      "title": "Legend",
+      "description": "Make 500 recordings"
+    },
+    "quiet_finder": {
+      "title": "Peace and Quiet",
+      "description": "Find a spot quieter than 40 dBA"
+    },
+    "loud_discoverer": {
+      "title": "Hotspot",
+      "description": "Find a spot louder than 85 dBA"
+    },
+    "night_owl": {
+      "title": "Night Watch",
+      "description": "Recording between 23:00 and 5:00"
+    },
+    "early_bird": {
+      "title": "Early Bird",
+      "description": "Recording between 5:00 and 7:00"
+    },
+    "streak_7": {
+      "title": "One Week Streak",
+      "description": "Record for 7 days in a row"
+    },
+    "streak_30": {
+      "title": "One Month Streak",
+      "description": "Record for 30 days in a row"
+    }
   }
 }

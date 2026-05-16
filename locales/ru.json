@@ -105,5 +105,51 @@
     "map": "Карта",
     "gamification": "Геймификация",
     "notifications": "Уведомления"
+  },
+  "achievements": {
+    "first_recording": {
+      "title": "Первый шаг",
+      "description": "Сделайте первую запись"
+    },
+    "recordings_10": {
+      "title": "Активист",
+      "description": "Сделайте 10 записей"
+    },
+    "recordings_50": {
+      "title": "Исследователь",
+      "description": "Сделайте 50 записей"
+    },
+    "recordings_100": {
+      "title": "Эксперт",
+      "description": "Сделайте 100 записей"
+    },
+    "recordings_500": {
+      "title": "Легенда",
+      "description": "Сделайте 500 записей"
+    },
+    "quiet_finder": {
+      "title": "Тишина и покой",
+      "description": "Найдите место тише 40 дБА"
+    },
+    "loud_discoverer": {
+      "title": "Горячая точка",
+      "description": "Найдите место громче 85 дБА"
+    },
+    "night_owl": {
+      "title": "Ночной дозор",
+      "description": "Сделайте запись между 23:00 и 5:00"
+    },
+    "early_bird": {
+      "title": "Ранняя пташка",
+      "description": "Сделайте запись между 5:00 и 7:00"
+    },
+    "streak_7": {
+      "title": "Неделя подряд",
+      "description": "Записывайте звук 7 дней подряд"
+    },
+    "streak_30": {
+      "title": "Месяц подряд",
+      "description": "Записывайте звук 30 дней подряд"
+    }
   }
 }
