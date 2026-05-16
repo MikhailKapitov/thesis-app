@@ -143,7 +143,9 @@ export default function RecorderScreen() {
 
       await prepare();
     })();
-  }, [prepare]);
+    // Runs only once on mount. Language changes and such should not re‑prepare.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!isRunning) return;
