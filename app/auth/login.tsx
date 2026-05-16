@@ -14,6 +14,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { Link } from "expo-router";
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { useLanguage } from '@/context/LanguageContext';
 import LanguagePicker from '@/components/LanguagePicker';
 
 export default function LoginScreen() {
@@ -21,19 +22,19 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
-
   const { backgroundColor, textColor, inputBg, placeholderColor, linkColor } = useThemeColors();
+  const { t } = useLanguage();
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert("Error", "Please enter email and password");
+      Alert.alert(t('auth.loginFailed'), t('auth.enterEmailPassword'));
       return;
     }
     setLoading(true);
     try {
       await login(email, password);
     } catch (error: any) {
-      Alert.alert("Login Failed", error.message);
+      Alert.alert(t('auth.loginFailed'), error.message);
     } finally {
       setLoading(false);
     }
@@ -52,10 +53,10 @@ export default function LoginScreen() {
         <View style={{ position: 'absolute', top: 64, right: 12, zIndex: 10 }}>
           <LanguagePicker />
         </View>
-        <Text style={[styles.title, { color: textColor }]}>Login</Text>
+        <Text style={[styles.title, { color: textColor }]}>{t('auth.loginTitle')}</Text>
         <TextInput
           style={[styles.input, { backgroundColor: inputBg, color: textColor }]}
-          placeholder="Email"
+          placeholder={t('auth.email')}
           placeholderTextColor={placeholderColor}
           value={email}
           onChangeText={setEmail}
@@ -64,7 +65,7 @@ export default function LoginScreen() {
         />
         <TextInput
           style={[styles.input, { backgroundColor: inputBg, color: textColor }]}
-          placeholder="Password"
+          placeholder={t('auth.password')}
           placeholderTextColor={placeholderColor}
           value={password}
           onChangeText={setPassword}
@@ -78,11 +79,11 @@ export default function LoginScreen() {
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.buttonText}>Login</Text>
+            <Text style={styles.buttonText}>{t('auth.loginButton')}</Text>
           )}
         </TouchableOpacity>
         <Link href="/auth/register" style={[styles.link, { color: linkColor }]}>
-          Don&apos;t have an account? Register
+          {t('auth.noAccount')}
         </Link>
       </ScrollView>
     </KeyboardAvoidingView>

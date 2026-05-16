@@ -15,6 +15,7 @@ import { useLocation } from "@/context/LocationContext";
 import { useAuth } from "@/context/AuthContext";
 import { api } from "@/services/api";
 import { useThemeColors } from "@/hooks/useThemeColors";
+import { useLanguage } from '@/context/LanguageContext';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://10.0.2.2:5000";
 
@@ -28,7 +29,8 @@ export default function MapScreen() {
 
   const { lastLocation, isAcquiring } = useLocation();
   const { user } = useAuth();
-  const colors = useThemeColors(); // access theme colours
+  const colors = useThemeColors();
+  const { t } = useLanguage();
 
   const finalHtml = MAP_HTML.replace(
     /const API_URL = ['"].*?['"];/,
@@ -48,12 +50,12 @@ export default function MapScreen() {
       sendGoto(
         lastLocation.coords.latitude,
         lastLocation.coords.longitude,
-        "You are here",
+        t('map.youAreHere'),
         16,
       );
     } else {
       Alert.alert(
-        isAcquiring ? "Still acquiring GPS signal…" : "Location not available",
+        isAcquiring ? t('map.acquiring') : t('map.locationNotAvailable')
       );
     }
   };
@@ -71,7 +73,7 @@ export default function MapScreen() {
         noiseClass: commentNoiseClass || undefined,
         noiseLevelDba: commentNoiseLevel ? parseFloat(commentNoiseLevel) : undefined,
       });
-      Alert.alert("Comment added", "Your comment has been posted.");
+      Alert.alert(t('map.commentAdded'), t('map.commentAddedMessage'));
       setCommentText("");
       setCommentNoiseClass("");
       setCommentNoiseLevel("");
@@ -107,7 +109,7 @@ export default function MapScreen() {
           ]}
           onPress={() => {
             if (isLocationReady) setCommentModalVisible(true);
-            else Alert.alert("Location required", "Wait for a GPS fix before adding a comment.");
+            else Alert.alert(t('map.locationRequired'), t('map.locationRequiredMessage'));
           }}
           disabled={!isLocationReady}
         >
@@ -136,11 +138,11 @@ export default function MapScreen() {
       >
         <View style={styles.modalBackdrop}>
           <View style={[styles.modalContent, { backgroundColor: colors.cardBg || colors.inputBg }]}>
-            <Text style={[styles.modalTitle, { color: colors.textColor }]}>Add Comment</Text>
+            <Text style={[styles.modalTitle, { color: colors.textColor }]}>{t('map.addComment')}</Text>
 
             <TextInput
               style={[styles.commentInput, { backgroundColor: colors.inputBg, color: colors.textColor }]}
-              placeholder="What do you want to say about this location?"
+              placeholder={t('map.commentPlaceholder')}
               placeholderTextColor={colors.placeholderColor}
               value={commentText}
               onChangeText={setCommentText}
@@ -149,19 +151,19 @@ export default function MapScreen() {
               maxLength={500}
             />
 
-            <Text style={[styles.label, { color: colors.placeholderColor }]}>Noise class (optional)</Text>
+            <Text style={[styles.label, { color: colors.placeholderColor }]}>{t('map.noiseClassLabel')}</Text>
             <TextInput
               style={[styles.input, { backgroundColor: colors.inputBg, color: colors.textColor }]}
-              placeholder="e.g. traffic, music"
+              placeholder={t('map.noiseClassPlaceholder')}
               placeholderTextColor={colors.placeholderColor}
               value={commentNoiseClass}
               onChangeText={setCommentNoiseClass}
             />
 
-            <Text style={[styles.label, { color: colors.placeholderColor }]}>Noise level (dB, optional)</Text>
+            <Text style={[styles.label, { color: colors.placeholderColor }]}>{t('map.noiseLevelLabel')}</Text>
             <TextInput
               style={[styles.input, { backgroundColor: colors.inputBg, color: colors.textColor }]}
-              placeholder="e.g. 72.5"
+              placeholder={t('map.noiseLevelPlaceholder')}
               placeholderTextColor={colors.placeholderColor}
               value={commentNoiseLevel}
               onChangeText={setCommentNoiseLevel}
@@ -173,7 +175,7 @@ export default function MapScreen() {
                 style={[styles.cancelBtn, { backgroundColor: colors.isDark ? "#444" : "#d1d5db" }]}
                 onPress={() => setCommentModalVisible(false)}
               >
-                <Text style={[styles.cancelBtnText, { color: colors.textColor }]}>Cancel</Text>
+                <Text style={[styles.cancelBtnText, { color: colors.textColor }]}>{t('map.cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[
@@ -187,7 +189,7 @@ export default function MapScreen() {
                 {submittingComment ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
-                  <Text style={styles.submitBtnText}>Post</Text>
+                  <Text style={styles.submitBtnText}>{t('map.post')}</Text>
                 )}
               </TouchableOpacity>
             </View>

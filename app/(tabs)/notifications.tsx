@@ -13,6 +13,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { api } from '@/services/api';
 import { useNotificationContext } from '@/context/NotificationContext';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface Notification {
   id: string;
@@ -39,6 +40,7 @@ export default function NotificationsScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const { refreshUnreadCount } = useNotificationContext();
   const colors = useThemeColors();
+  const { t } = useLanguage();
 
   const fetchNotifications = useCallback(async (p = 0) => {
     setLoading(true);
@@ -52,12 +54,12 @@ export default function NotificationsScreen() {
       setTotalPages(data.totalPages);
       setPage(p);
     } catch (err: any) {
-      Alert.alert('Error', err.message);
+      Alert.alert(t('notifications.error'), err.message);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, []);
+  }, [t]);
 
   useFocusEffect(
     useCallback(() => {
@@ -74,7 +76,7 @@ export default function NotificationsScreen() {
       );
       refreshUnreadCount();
     } catch (err: any) {
-      Alert.alert('Error', err.message);
+      Alert.alert(t('notifications.error'), err.message);
     }
   };
 
@@ -86,7 +88,7 @@ export default function NotificationsScreen() {
       );
       refreshUnreadCount();
     } catch (err: any) {
-      Alert.alert('Error', err.message);
+      Alert.alert(t('notifications.error'), err.message);
     }
   };
 
@@ -125,9 +127,9 @@ export default function NotificationsScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
       <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.textColor }]}>Notifications</Text>
+        <Text style={[styles.title, { color: colors.textColor }]}>{t('notifications.title')}</Text>
         <TouchableOpacity onPress={handleMarkAllRead}>
-          <Text style={[styles.markAllText, { color: colors.linkColor }]}>Mark all read</Text>
+          <Text style={[styles.markAllText, { color: colors.linkColor }]}>{t('notifications.markAllRead')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -150,7 +152,7 @@ export default function NotificationsScreen() {
         }
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={
-          !loading ? <Text style={[styles.emptyText, { color: colors.isDark ? '#555' : '#9ca3af' }]}>No notifications yet</Text> : null
+          !loading ? <Text style={[styles.emptyText, { color: colors.isDark ? '#555' : '#9ca3af' }]}>{t('notifications.noNotifications')}</Text> : null
         }
       />
     </View>

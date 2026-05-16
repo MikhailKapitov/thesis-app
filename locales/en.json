@@ -1,1 +1,95 @@
-{}
+{
+  "auth": {
+    "loginTitle": "Login",
+    "registerTitle": "Register",
+    "email": "Email",
+    "password": "Password",
+    "displayName": "Display Name",
+    "confirmPassword": "Confirm Password",
+    "loginButton": "Login",
+    "registerButton": "Register",
+    "noAccount": "Don't have an account? Register",
+    "hasAccount": "Already have an account? Login",
+    "loginFailed": "Login Failed",
+    "registerFailed": "Registration Failed",
+    "fieldsRequired": "All fields are required",
+    "passwordsMatch": "Passwords do not match",
+    "enterEmailPassword": "Please enter email and password"
+  },
+  "map": {
+    "addComment": "Add Comment",
+    "commentPlaceholder": "What do you want to say about this location?",
+    "noiseClassLabel": "Noise class (optional)",
+    "noiseClassPlaceholder": "e.g. traffic, music",
+    "noiseLevelLabel": "Noise level (dB, optional)",
+    "noiseLevelPlaceholder": "e.g. 72.5",
+    "cancel": "Cancel",
+    "post": "Post",
+    "commentAdded": "Comment added",
+    "commentAddedMessage": "Your comment has been posted.",
+    "locationRequired": "Location required",
+    "locationRequiredMessage": "Wait for a GPS fix before adding a comment.",
+    "youAreHere": "You are here",
+    "acquiring": "Still acquiring GPS signal…",
+    "locationNotAvailable": "Location not available"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all read",
+    "noNotifications": "No notifications yet",
+    "error": "Error"
+  },
+  "gamification": {
+    "me": "Me",
+    "leaderboard": "Leaderboard",
+    "statistics": "Statistics",
+    "level": "Level",
+    "points": "Points",
+    "recordings": "Recordings",
+    "dayStreak": "Day Streak",
+    "achievements": "Achievements",
+    "noAchievements": "No achievements yet",
+    "you": "You",
+    "pts": "pts",
+    "rec": "rec",
+    "leaderboardUnavailable": "Leaderboard unavailable",
+    "noStatistics": "No statistics available",
+    "cityOverview": "City Overview",
+    "byNoiseType": "By Noise Type",
+    "yourStats": "Your Stats",
+    "yourNoiseMix": "Your Noise Mix",
+    "healthAdvice": "Health Advice",
+    "avgDb": "Avg. dB",
+    "maxDb": "Max dB",
+    "measurements": "Measurements",
+    "contributors": "Contributors"
+  },
+  "recorder": {
+    "title": "Periodic Recorder",
+    "ready": "📍 Ready",
+    "acquiring": "🔄 Acquiring GPS…",
+    "noLocation": "⚠️ No location",
+    "secondsUntil": "seconds until next recording",
+    "recording": "🔴 Recording…",
+    "start": "Start",
+    "stop": "Stop",
+    "logsEmpty": "Logs will appear here…"
+  },
+  "settings": {
+    "title": "Settings",
+    "account": "Account",
+    "email": "Email",
+    "name": "Name",
+    "notSignedIn": "Not signed in",
+    "logout": "Log out",
+    "logoutConfirm": "Are you sure you want to log out?",
+    "cancel": "Cancel"
+  },
+  "tabs": {
+    "settings": "Settings",
+    "recorder": "Recorder",
+    "map": "Map",
+    "gamification": "Gamification",
+    "notifications": "Notifications"
+  }
+}

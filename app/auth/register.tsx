@@ -14,6 +14,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { Link } from "expo-router";
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { useLanguage } from '@/context/LanguageContext';
 import LanguagePicker from '@/components/LanguagePicker';
 
 export default function RegisterScreen() {
@@ -23,23 +24,23 @@ export default function RegisterScreen() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
-
   const { backgroundColor, textColor, inputBg, placeholderColor, linkColor } = useThemeColors();
+  const { t } = useLanguage();
 
   const handleRegister = async () => {
     if (!email || !displayName || !password || !confirmPassword) {
-      Alert.alert("Error", "All fields are required");
+      Alert.alert(t('auth.registerFailed'), t('auth.fieldsRequired'));
       return;
     }
     if (password !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match");
+      Alert.alert(t('auth.registerFailed'), t('auth.passwordsMatch'));
       return;
     }
     setLoading(true);
     try {
       await register(email, password, displayName);
     } catch (error: any) {
-      Alert.alert("Registration Failed", error.message);
+      Alert.alert(t('auth.registerFailed'), error.message);
     } finally {
       setLoading(false);
     }
@@ -58,10 +59,10 @@ export default function RegisterScreen() {
         <View style={{ position: 'absolute', top: 64, right: 12, zIndex: 10 }}>
           <LanguagePicker />
         </View>
-        <Text style={[styles.title, { color: textColor }]}>Register</Text>
+        <Text style={[styles.title, { color: textColor }]}>{t('auth.registerTitle')}</Text>
         <TextInput
           style={[styles.input, { backgroundColor: inputBg, color: textColor }]}
-          placeholder="Display Name"
+          placeholder={t('auth.displayName')}
           placeholderTextColor={placeholderColor}
           value={displayName}
           onChangeText={setDisplayName}
@@ -69,7 +70,7 @@ export default function RegisterScreen() {
         />
         <TextInput
           style={[styles.input, { backgroundColor: inputBg, color: textColor }]}
-          placeholder="Email"
+          placeholder={t('auth.email')}
           placeholderTextColor={placeholderColor}
           value={email}
           onChangeText={setEmail}
@@ -78,7 +79,7 @@ export default function RegisterScreen() {
         />
         <TextInput
           style={[styles.input, { backgroundColor: inputBg, color: textColor }]}
-          placeholder="Password"
+          placeholder={t('auth.password')}
           placeholderTextColor={placeholderColor}
           value={password}
           onChangeText={setPassword}
@@ -86,7 +87,7 @@ export default function RegisterScreen() {
         />
         <TextInput
           style={[styles.input, { backgroundColor: inputBg, color: textColor }]}
-          placeholder="Confirm Password"
+          placeholder={t('auth.confirmPassword')}
           placeholderTextColor={placeholderColor}
           value={confirmPassword}
           onChangeText={setConfirmPassword}
@@ -100,11 +101,11 @@ export default function RegisterScreen() {
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.buttonText}>Register</Text>
+            <Text style={styles.buttonText}>{t('auth.registerButton')}</Text>
           )}
         </TouchableOpacity>
         <Link href="/auth/login" style={[styles.link, { color: linkColor }]}>
-          Already have an account? Login
+          {t('auth.hasAccount')}
         </Link>
       </ScrollView>
     </KeyboardAvoidingView>

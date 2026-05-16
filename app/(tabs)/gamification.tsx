@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { api } from '@/services/api';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { useLanguage } from '@/context/LanguageContext';
 
 // ---------- Helper ----------
 const formatDba = (value: number | null | undefined) =>
@@ -74,6 +75,7 @@ export default function GamificationScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<ActiveTab>('profile');
   const colors = useThemeColors();
+  const { t } = useLanguage();
 
   const fetchData = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -106,7 +108,7 @@ export default function GamificationScreen() {
     <View style={[styles.achievementCard, { backgroundColor: colors.cardBg || colors.inputBg, borderLeftColor: '#fbbf24' }]}>
       <View style={styles.achievementTitleRow}>
         <Text style={[styles.achievementTitle, { color: colors.textColor }]}>
-          🏅 {item.title} <Text style={styles.achievementPoints}>+{item.pointsAwarded} pts</Text>
+          🏅 {item.title} <Text style={styles.achievementPoints}>+{item.pointsAwarded} {t('gamification.pts')}</Text>
         </Text>
       </View>
       <Text style={[styles.achievementDesc, { color: colors.isDark ? '#aaa' : '#6b7280' }]}>{item.description}</Text>
@@ -130,11 +132,11 @@ export default function GamificationScreen() {
         </View>
         <View style={styles.leaderInfo}>
           <Text style={[styles.leaderName, { color: colors.textColor }]} numberOfLines={1}>
-            {isYou ? 'You' : `${item.userId.slice(0, 8)}...`}
+            {isYou ? t('gamification.you') : `${item.userId.slice(0, 8)}...`}
           </Text>
-          <Text style={[styles.leaderStats, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>{item.totalPoints} pts · Level {item.level}</Text>
+          <Text style={[styles.leaderStats, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>{item.totalPoints} {t('gamification.pts')} · {t('gamification.level')} {item.level}</Text>
         </View>
-        <Text style={[styles.leaderRecordings, { color: colors.linkColor }]}>{item.totalRecordings} rec</Text>
+        <Text style={[styles.leaderRecordings, { color: colors.linkColor }]}>{item.totalRecordings} {t('gamification.rec')}</Text>
       </View>
     );
   };
@@ -144,7 +146,7 @@ export default function GamificationScreen() {
     if (!cityStats || !myStats) {
       return (
         <View style={styles.emptyContainer}>
-          <Text style={[styles.emptyText, { color: colors.isDark ? '#555' : '#9ca3af' }]}>No statistics available</Text>
+          <Text style={[styles.emptyText, { color: colors.isDark ? '#555' : '#9ca3af' }]}>{t('gamification.noStatistics')}</Text>
         </View>
       );
     }
@@ -158,28 +160,28 @@ export default function GamificationScreen() {
         }
       >
         {/* City Statistics */}
-        <Text style={[styles.sectionTitle, { color: colors.textColor }]}>City Overview</Text>
+        <Text style={[styles.sectionTitle, { color: colors.textColor }]}>{t('gamification.cityOverview')}</Text>
         <View style={styles.statsRow}>
           <View style={styles.statCell}>
             <Text style={[styles.statValue, { color: colors.textColor }]}>{formatDba(cityStats.avgNoiseLevelDba)}</Text>
-            <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>Avg. dB</Text>
+            <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>{t('gamification.avgDb')}</Text>
           </View>
           <View style={styles.statCell}>
             <Text style={[styles.statValue, { color: colors.textColor }]}>{formatDba(cityStats.maxNoiseLevelDba)}</Text>
-            <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>Max dB</Text>
+            <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>{t('gamification.maxDb')}</Text>
           </View>
           <View style={styles.statCell}>
             <Text style={[styles.statValue, { color: colors.textColor }]}>{cityStats.totalMeasurements}</Text>
-            <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>Measurements</Text>
+            <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>{t('gamification.measurements')}</Text>
           </View>
           <View style={styles.statCell}>
             <Text style={[styles.statValue, { color: colors.textColor }]}>{cityStats.totalContributors}</Text>
-            <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>Contributors</Text>
+            <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>{t('gamification.contributors')}</Text>
           </View>
         </View>
 
         {/* Noise Class Breakdown */}
-        <Text style={[styles.subSectionTitle, { color: colors.isDark ? '#ccc' : '#4b5563' }]}>By Noise Type</Text>
+        <Text style={[styles.subSectionTitle, { color: colors.isDark ? '#ccc' : '#4b5563' }]}>{t('gamification.byNoiseType')}</Text>
         {Object.entries(cityStats.measurementsByNoiseClass ?? {}).map(([cls, count]) => (
           <View key={cls} style={styles.classRow}>
             <Text style={[styles.className, { color: colors.isDark ? '#ccc' : '#4b5563' }]}>{cls}</Text>
@@ -194,26 +196,26 @@ export default function GamificationScreen() {
         ))}
 
         {/* Personal Statistics */}
-        <Text style={[styles.sectionTitle, { color: colors.textColor, marginTop: 24 }]}>Your Stats</Text>
+        <Text style={[styles.sectionTitle, { color: colors.textColor, marginTop: 24 }]}>{t('gamification.yourStats')}</Text>
         <View style={styles.statsRow}>
           <View style={styles.statCell}>
             <Text style={[styles.statValue, { color: colors.textColor }]}>{myStats.totalRecordings}</Text>
-            <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>Recordings</Text>
+            <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>{t('gamification.recordings')}</Text>
           </View>
           <View style={styles.statCell}>
             <Text style={[styles.statValue, { color: colors.textColor }]}>{formatDba(myStats.avgExposureDba)}</Text>
-            <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>Avg. dB</Text>
+            <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>{t('gamification.avgDb')}</Text>
           </View>
           <View style={styles.statCell}>
             <Text style={[styles.statValue, { color: colors.textColor }]}>{formatDba(myStats.maxExposureDba)}</Text>
-            <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>Max dB</Text>
+            <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>{t('gamification.maxDb')}</Text>
           </View>
         </View>
 
         {/* Personal Noise Classes */}
         {Object.keys(myStats.recordingsByNoiseClass ?? {}).length > 0 && (
           <>
-            <Text style={[styles.subSectionTitle, { color: colors.isDark ? '#ccc' : '#4b5563' }]}>Your Noise Mix</Text>
+            <Text style={[styles.subSectionTitle, { color: colors.isDark ? '#ccc' : '#4b5563' }]}>{t('gamification.yourNoiseMix')}</Text>
             {Object.entries(myStats.recordingsByNoiseClass ?? {}).map(([cls, count]) => (
               <View key={cls} style={styles.classRow}>
                 <Text style={[styles.className, { color: colors.isDark ? '#ccc' : '#4b5563' }]}>{cls}</Text>
@@ -232,7 +234,7 @@ export default function GamificationScreen() {
         {/* Recommendation */}
         {myStats.recommendation ? (
           <View style={[styles.recommendationBox, { backgroundColor: colors.cardBg || colors.inputBg, borderLeftColor: '#f59e0b' }]}>
-            <Text style={styles.recommendationTitle}>Health Advice</Text>
+            <Text style={styles.recommendationTitle}>{t('gamification.healthAdvice')}</Text>
             <Text style={[styles.recommendationText, { color: colors.isDark ? '#ddd' : '#374151' }]}>{myStats.recommendation}</Text>
           </View>
         ) : null}
@@ -257,19 +259,19 @@ export default function GamificationScreen() {
           style={[styles.tab, activeTab === 'profile' && { backgroundColor: colors.linkColor }]}
           onPress={() => setActiveTab('profile')}
         >
-          <Text style={[styles.tabText, { color: activeTab === 'profile' ? '#fff' : colors.textColor }]}>Me</Text>
+          <Text style={[styles.tabText, { color: activeTab === 'profile' ? '#fff' : colors.textColor }]}>{t('gamification.me')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tab, activeTab === 'leaderboard' && { backgroundColor: colors.linkColor }]}
           onPress={() => setActiveTab('leaderboard')}
         >
-          <Text style={[styles.tabText, { color: activeTab === 'leaderboard' ? '#fff' : colors.textColor }]}>Leaderboard</Text>
+          <Text style={[styles.tabText, { color: activeTab === 'leaderboard' ? '#fff' : colors.textColor }]}>{t('gamification.leaderboard')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tab, activeTab === 'statistics' && { backgroundColor: colors.linkColor }]}
           onPress={() => setActiveTab('statistics')}
         >
-          <Text style={[styles.tabText, { color: activeTab === 'statistics' ? '#fff' : colors.textColor }]}>Statistics</Text>
+          <Text style={[styles.tabText, { color: activeTab === 'statistics' ? '#fff' : colors.textColor }]}>{t('gamification.statistics')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -282,28 +284,28 @@ export default function GamificationScreen() {
             <View>
               {profile && (
                 <View style={[styles.profileCard, { backgroundColor: colors.isDark ? '#1e293b' : '#f3f4f6' }]}>
-                  <Text style={styles.levelText}>Level {profile.level}</Text>
+                  <Text style={styles.levelText}>{t('gamification.level')} {profile.level}</Text>
                   <View style={styles.statsGrid}>
                     <View style={styles.statBox}>
                       <Text style={[styles.statNumber, { color: colors.textColor }]}>{profile.totalPoints}</Text>
-                      <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>Points</Text>
+                      <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>{t('gamification.points')}</Text>
                     </View>
                     <View style={styles.statBox}>
                       <Text style={[styles.statNumber, { color: colors.textColor }]}>{profile.totalRecordings}</Text>
-                      <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>Recordings</Text>
+                      <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>{t('gamification.recordings')}</Text>
                     </View>
                     <View style={styles.statBox}>
                       <Text style={[styles.statNumber, { color: colors.textColor }]}>{profile.currentStreak}</Text>
-                      <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>Day Streak</Text>
+                      <Text style={[styles.statLabel, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>{t('gamification.dayStreak')}</Text>
                     </View>
                   </View>
                 </View>
               )}
-              <Text style={[styles.sectionTitle, { color: colors.textColor }]}>Achievements</Text>
+              <Text style={[styles.sectionTitle, { color: colors.textColor }]}>{t('gamification.achievements')}</Text>
             </View>
           )}
           contentContainerStyle={styles.scrollContent}
-          ListEmptyComponent={() => <Text style={[styles.emptyText, { color: colors.isDark ? '#555' : '#9ca3af' }]}>No achievements yet</Text>}
+          ListEmptyComponent={() => <Text style={[styles.emptyText, { color: colors.isDark ? '#555' : '#9ca3af' }]}>{t('gamification.noAchievements')}</Text>}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={() => fetchData(true)} tintColor={colors.linkColor} />
           }
@@ -314,7 +316,7 @@ export default function GamificationScreen() {
           keyExtractor={item => item.userId}
           renderItem={renderLeader}
           contentContainerStyle={styles.scrollContent}
-          ListEmptyComponent={() => <Text style={[styles.emptyText, { color: colors.isDark ? '#555' : '#9ca3af' }]}>Leaderboard unavailable</Text>}
+          ListEmptyComponent={() => <Text style={[styles.emptyText, { color: colors.isDark ? '#555' : '#9ca3af' }]}>{t('gamification.leaderboardUnavailable')}</Text>}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={() => fetchData(true)} tintColor={colors.linkColor} />
           }

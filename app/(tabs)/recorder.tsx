@@ -17,6 +17,7 @@ import { AudioModule, RecordingPresets, useAudioRecorder, useAudioRecorderState 
 import { useLocation } from "@/context/LocationContext";
 import { api } from "@/services/api";
 import { useThemeColors } from "@/hooks/useThemeColors";
+import { useLanguage } from '@/context/LanguageContext';
 
 const COUNTDOWN_SEC = 5;
 const RECORD_DURATION_MS = 2000;
@@ -38,6 +39,7 @@ export default function RecorderScreen() {
 
   const { lastLocation, isAcquiring } = useLocation();
   const colors = useThemeColors();
+  const { t } = useLanguage();
 
   const log = useCallback((msg: string) => {
     setLogs((prev) => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev]);
@@ -200,14 +202,14 @@ export default function RecorderScreen() {
   };
 
   const locationStatus = lastLocation
-    ? "📍 Ready"
+    ? t('recorder.ready')
     : isAcquiring
-      ? "🔄 Acquiring GPS…"
-      : "⚠️ No location";
+      ? t('recorder.acquiring')
+      : t('recorder.noLocation');
 
   return (
     <View style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
-      <Text style={[styles.title, { color: colors.textColor }]}>Periodic Recorder</Text>
+      <Text style={[styles.title, { color: colors.textColor }]}>{t('recorder.title')}</Text>
       <Text style={[styles.locationStatus, { color: colors.isDark ? '#aaa' : '#6b7280' }]}>{locationStatus}</Text>
 
       {isRunning && (
@@ -216,7 +218,7 @@ export default function RecorderScreen() {
           <Text style={[styles.timerLabel, { color: colors.isDark ? '#888' : '#6b7280' }]}>
             {isRecordingRef.current ? (
               <View style={{ alignItems: 'center' }}>
-                <Text style={{ color: colors.textColor }}>🔴 Recording…</Text>
+                <Text style={{ color: colors.textColor }}>{t('recorder.recording')}</Text>
                 <View style={[styles.meterContainer, { backgroundColor: colors.isDark ? '#333' : '#e5e7eb' }]}>
                   <View style={[styles.meterBar, {
                     width: `${Math.min(100, Math.max(0, (currentMetering + 60) * 2))}%`,
@@ -225,7 +227,7 @@ export default function RecorderScreen() {
                 </View>
               </View>
             ) : (
-              "seconds until next recording"
+              t('recorder.secondsUntil')
             )}
           </Text>
         </View>
@@ -235,7 +237,7 @@ export default function RecorderScreen() {
         style={[styles.btn, isRunning && styles.btnStop, { backgroundColor: isRunning ? '#dc2626' : colors.linkColor }]}
         onPress={toggle}
       >
-        <Text style={styles.btnText}>{isRunning ? "Stop" : "Start"}</Text>
+        <Text style={styles.btnText}>{isRunning ? t('recorder.stop') : t('recorder.start')}</Text>
       </TouchableOpacity>
 
       <ScrollView
@@ -243,7 +245,7 @@ export default function RecorderScreen() {
         contentContainerStyle={styles.logContent}
       >
         {logs.length === 0 ? (
-          <Text style={[styles.logEmpty, { color: colors.isDark ? '#444' : '#9ca3af' }]}>Logs will appear here…</Text>
+          <Text style={[styles.logEmpty, { color: colors.isDark ? '#444' : '#9ca3af' }]}>{t('recorder.logsEmpty')}</Text>
         ) : (
           logs.map((l, i) => (
             <Text key={i} style={[styles.logLine, { color: colors.isDark ? '#ccc' : '#4b5563' }]}>

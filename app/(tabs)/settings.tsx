@@ -1,18 +1,19 @@
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useAuth } from "@/context/AuthContext";
 import { useThemeColors } from "@/hooks/useThemeColors";
-
+import { useLanguage } from '@/context/LanguageContext';
 import LanguagePicker from '@/components/LanguagePicker';
 
 export default function SettingsScreen() {
   const { user, logout } = useAuth();
   const colors = useThemeColors();
+  const { t } = useLanguage();
 
   const handleLogout = async () => {
-    Alert.alert("Logout", "Are you sure you want to logout?", [
-      { text: "Cancel", style: "cancel" },
+    Alert.alert(t('settings.logout'), t('settings.logoutConfirm'), [
+      { text: t('settings.cancel'), style: "cancel" },
       {
-        text: "Logout",
+        text: t('settings.logout'),
         style: "destructive",
         onPress: async () => {
           await logout();
@@ -23,24 +24,24 @@ export default function SettingsScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
-      <Text style={[styles.title, { color: colors.textColor }]}>Settings</Text>
+      <Text style={[styles.title, { color: colors.textColor }]}>{t('settings.title')}</Text>
 
       <View style={{ position: 'absolute', top: 64, right: 12, zIndex: 10 }}>
         <LanguagePicker />
       </View>
 
       <View style={styles.section}>
-        <Text style={[styles.label, { color: colors.isDark ? '#888' : '#6b7280' }]}>Account</Text>
+        <Text style={[styles.label, { color: colors.isDark ? '#888' : '#6b7280' }]}>{t('settings.account')}</Text>
         <View style={[styles.card, { backgroundColor: colors.inputBg }]}>
           <Text style={[styles.userInfo, { color: colors.textColor }]}>
-            Email: {user?.email || "Not signed in"}
+            {t('settings.email')}: {user?.email || t('settings.notSignedIn')}
           </Text>
-          <Text style={[styles.userInfo, { color: colors.textColor }]}>Name: {user?.displayName || "—"}</Text>
+          <Text style={[styles.userInfo, { color: colors.textColor }]}>{t('settings.name')}: {user?.displayName || "—"}</Text>
         </View>
       </View>
 
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutText}>Logout</Text>
+        <Text style={styles.logoutText}>{t('settings.logout')}</Text>
       </TouchableOpacity>
     </View>
   );
