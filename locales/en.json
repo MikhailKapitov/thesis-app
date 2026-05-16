@@ -73,7 +73,21 @@
     "recording": "🔴 Recording…",
     "start": "Start",
     "stop": "Stop",
-    "logsEmpty": "Logs will appear here…"
+    "logsEmpty": "Logs will appear here…",
+    "notificationTitle": "Periodic Recorder",
+    "notificationBody": "Recording every {seconds} seconds…",
+    "logPrepareFailed": "⚠️ Prepare failed: {message}",
+    "logNotReady": "⚠️ Recorder not ready — attempting re‑prepare…",
+    "logReprepareFailed": "❌ Re‑prepare failed, skipping this cycle",
+    "logRecordingFor": "▶ Recording for {duration}s…",
+    "logLocationUnavailable": "⚠️ Location unavailable {acquiring}",
+    "logRecorderStoppedUnexpectedly": "⚠️ Recorder stopped unexpectedly",
+    "logNoUri": "⚠️ No URI after stop — upload skipped",
+    "logNoLocationData": "❌ No location data, upload skipped",
+    "logUploading": "📤 Uploading recording…",
+    "logUploaded": "✅ Uploaded: ID {id}",
+    "logUploadFailed": "❌ Upload failed: {message}",
+    "logError": "❌ {message}"
   },
   "settings": {
     "title": "Settings",

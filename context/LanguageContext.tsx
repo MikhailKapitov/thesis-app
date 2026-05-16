@@ -14,7 +14,7 @@ const LANGUAGE_KEY = 'appLanguage';
 interface LanguageContextType {
   locale: string;
   setLocale: (locale: string) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType>({
@@ -53,13 +53,19 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
-  const t = (key: string): string => {
+  const t = (key: string, params?: Record<string, string | number>): string => {
     const keys = key.split('.');
-    let result = translations[locale] || translations.en;
+    let result: any = translations[locale] || translations.en;
     for (const k of keys) {
-      result = result?.[k];
+        result = result?.[k];
     }
-    return result ?? key;
+    if (typeof result !== 'string') return key;
+    if (params) {
+        return result.replace(/\{(\w+)\}/g, (_, name) => {
+        return name in params ? String(params[name]) : `{${name}}`;
+        });
+    }
+    return result;
   };
 
   return (

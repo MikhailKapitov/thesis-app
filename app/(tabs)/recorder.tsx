@@ -50,34 +50,33 @@ export default function RecorderScreen() {
       await audioRecorder.prepareToRecordAsync();
       isPreparedRef.current = true;
     } catch (e: any) {
-      // If the recorder is already prepared (e.g. after a Fast Refresh), treat it as ready instead of failing.
-      if (e?.message?.includes('already been prepared')) { // Yes, I hate this check.
+      if (e?.message?.includes('already been prepared')) {
         isPreparedRef.current = true;
         return;
       }
       isPreparedRef.current = false;
-      log(`⚠️ Prepare failed: ${e.message}`);
+      log(t('recorder.logPrepareFailed', { message: e.message }));
     }
-  }, [audioRecorder, log]);
+  }, [audioRecorder, log, t]);
 
   const triggerRecording = useCallback(async () => {
     if (!isPreparedRef.current) {
-      log("⚠️ Recorder not ready — attempting re‑prepare…");
+      log(t('recorder.logNotReady'));
       await prepare();
       if (!isPreparedRef.current) {
-        log("❌ Re‑prepare failed, skipping this cycle");
+        log(t('recorder.logReprepareFailed'));
         return;
       }
     }
 
     isRecordingRef.current = true;
     isPreparedRef.current = false;
-    log(`▶ Recording for ${RECORD_DURATION_MS / 1000}s…`);
+    log(t('recorder.logRecordingFor', { duration: RECORD_DURATION_MS / 1000 }));
 
     try {
       const location = lastLocation;
       if (!location) {
-        log(`⚠️ Location unavailable ${isAcquiring ? "(acquiring…)" : ""}`);
+        log(t('recorder.logLocationUnavailable', { acquiring: isAcquiring ? t('recorder.acquiring') : '' }));
       }
 
       audioRecorder.record();
@@ -86,7 +85,7 @@ export default function RecorderScreen() {
       if (audioRecorder.isRecording) {
         await audioRecorder.stop();
       } else {
-        log("⚠️ Recorder stopped unexpectedly");
+        log(t('recorder.logRecorderStoppedUnexpectedly'));
       }
 
       const uri = audioRecorder.uri;
@@ -94,14 +93,14 @@ export default function RecorderScreen() {
       prepare();
 
       if (!uri) {
-        log("⚠️ No URI after stop — upload skipped");
+        log(t('recorder.logNoUri'));
         return;
       }
 
       const lat = location?.coords.latitude;
       const lon = location?.coords.longitude;
       if (lat == null || lon == null) {
-        log("❌ No location data, upload skipped");
+        log(t('recorder.logNoLocationData'));
         return;
       }
 
@@ -112,19 +111,19 @@ export default function RecorderScreen() {
         recordedAt: new Date().toISOString(),
       };
 
-      log("📤 Uploading recording…");
+      log(t('recorder.logUploading'));
       try {
         const result = await api.uploadRecording(uri, metadata);
-        log(`✅ Uploaded: ID ${result.id || "unknown"}`);
+        log(t('recorder.logUploaded', { id: result.id || 'unknown' }));
       } catch (uploadErr: any) {
-        log(`❌ Upload failed: ${uploadErr.message}`);
+        log(t('recorder.logUploadFailed', { message: uploadErr.message }));
       }
     } catch (e: any) {
-      log(`❌ ${e.message}`);
+      log(t('recorder.logError', { message: e.message }));
     } finally {
       isRecordingRef.current = false;
     }
-  }, [lastLocation, isAcquiring, audioRecorder, log, prepare]);
+  }, [lastLocation, isAcquiring, audioRecorder, log, prepare, t]);
 
   const triggerRecordingRef = useRef(triggerRecording);
   useEffect(() => {
@@ -189,8 +188,8 @@ export default function RecorderScreen() {
       setCountdown(COUNTDOWN_SEC);
       setIsRunning(true);
       await notifee.displayNotification({
-        title: "Periodic Recorder",
-        body: `Recording every ${COUNTDOWN_SEC} seconds…`,
+        title: t('recorder.notificationTitle'),
+        body: t('recorder.notificationBody', { seconds: COUNTDOWN_SEC }),
         android: {
           channelId: CHANNEL_ID,
           asForegroundService: true,
