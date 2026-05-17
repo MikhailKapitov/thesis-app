@@ -60,7 +60,7 @@ interface MyStats {
   maxExposureDba: number;
   recordingsByNoiseClass: Record<string, number>;
   personalHourlyAverages: any;
-  recommendation: string;
+  recommendationKey: string;
 }
 
 type ActiveTab = 'profile' | 'leaderboard' | 'statistics';
@@ -232,10 +232,10 @@ export default function GamificationScreen() {
         )}
 
         {/* Recommendation */}
-        {myStats.recommendation ? (
+        {myStats.recommendationKey ? (
           <View style={[styles.recommendationBox, { backgroundColor: colors.cardBg || colors.inputBg, borderLeftColor: '#f59e0b' }]}>
             <Text style={styles.recommendationTitle}>{t('gamification.healthAdvice')}</Text>
-            <Text style={[styles.recommendationText, { color: colors.isDark ? '#ddd' : '#374151' }]}>{myStats.recommendation}</Text>
+            <Text style={[styles.recommendationText, { color: colors.isDark ? '#ddd' : '#374151' }]}>{t(`gamification.recommendation.${myStats.recommendationKey}`)}</Text>
           </View>
         ) : null}
       </ScrollView>
