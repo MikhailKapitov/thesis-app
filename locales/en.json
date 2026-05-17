@@ -62,7 +62,14 @@
     "avgDb": "Avg. dB",
     "maxDb": "Max dB",
     "measurements": "Measurements",
-    "contributors": "Contributors"
+    "contributors": "Contributors",
+    "recommendation": {
+      "goodLevel": "Your environment is within WHO norms. Excellent acoustic setting!",
+      "moderateLevel": "Moderate noise level. We recommend taking breaks in quiet places.",
+      "highLevel": "Elevated noise level. Long-term exposure may affect health.",
+      "dangerousLevel": "Dangerous noise level! Hearing protection is advised.",
+      "noData": "Make your first recording to see your statistics!"
+    }
   },
   "recorder": {
     "title": "Periodic Recorder",
