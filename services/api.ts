@@ -109,7 +109,7 @@ export const api = {
       headers: buildHeaders(accessToken),
     });
 
-    // Token refresh (same as before)
+    // Token refresh
     if (response.status === 401 && accessToken) {
       console.log('[API] Received 401, attempting token refresh...');
       const newToken = await tryRefreshToken();
