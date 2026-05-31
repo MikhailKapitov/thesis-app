@@ -30,12 +30,17 @@ export default function MapScreen() {
   const { lastLocation, isAcquiring } = useLocation();
   const { user } = useAuth();
   const colors = useThemeColors();
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
 
-  const finalHtml = MAP_HTML.replace(
-    /const API_URL = ['"].*?['"];/,
-    `const API_URL = '${API_URL}';`,
-  );
+  const finalHtml = MAP_HTML
+    .replace(
+      /const API_URL = ['"].*?['"];/,
+      `const API_URL = '${API_URL}';`
+    )
+    .replace(
+      '</head>',
+      `<script>window.VIEWER_LANG='${locale}';</script></head>`
+    );
 
   const sendGoto = (lat: number, lon: number, label: string, zoom = 14) => {
     webRef.current?.injectJavaScript(`
@@ -91,6 +96,7 @@ export default function MapScreen() {
     <View style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
       <WebView
         ref={webRef}
+        // key={locale}
         style={[styles.map, { backgroundColor: colors.backgroundColor }]}
         source={{ html: finalHtml }}
         originWhitelist={["*"]}
