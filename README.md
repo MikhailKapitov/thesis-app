@@ -34,8 +34,7 @@ After cloning this repository, make sure to run `git submodule update --init --r
 
 ## TODO
 
-- Pray and run this on iOS;
-- Add all the missing server functionality (Like stats and such).
+- Add the remaining missing server functionality (Mostly settings).
 - Work on the UI/UX.
 - Testing?
 - Clean up the packages.
