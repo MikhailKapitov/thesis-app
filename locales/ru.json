@@ -14,7 +14,12 @@
     "registerFailed": "Ошибка регистрации",
     "fieldsRequired": "Все поля обязательны для заполнения",
     "passwordsMatch": "Пароли не совпадают",
-    "enterEmailPassword": "Введите email и пароль"
+    "enterEmailPassword": "Введите email и пароль",
+    "forgotPassword": "Забыли пароль?",
+    "forgotPasswordTitle": "Сброс пароля",
+    "forgotPasswordPrompt": "Введите адрес электронной почты, чтобы получить ссылку для сброса.",
+    "sendResetLink": "Отправить ссылку для сброса",
+    "backToLogin": "Вернуться ко входу"
   },
   "map": {
     "addComment": "Добавить комментарий",
