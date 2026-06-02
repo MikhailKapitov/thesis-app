@@ -85,6 +85,9 @@ export default function LoginScreen() {
         <Link href="/auth/register" style={[styles.link, { color: linkColor }]}>
           {t('auth.noAccount')}
         </Link>
+        <Link href={"/auth/forgot-password" as any} style={[styles.link, { color: linkColor }]}>
+          {t('auth.forgotPassword')}
+        </Link>
       </ScrollView>
     </KeyboardAvoidingView>
   );

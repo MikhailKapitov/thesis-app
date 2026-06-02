@@ -14,7 +14,12 @@
     "registerFailed": "Registration Failed",
     "fieldsRequired": "All fields are required",
     "passwordsMatch": "Passwords do not match",
-    "enterEmailPassword": "Please enter email and password"
+    "enterEmailPassword": "Please enter email and password",
+    "forgotPassword": "Forgot password?",
+    "forgotPasswordTitle": "Reset Password",
+    "forgotPasswordPrompt": "Enter your email address to receive a reset link.",
+    "sendResetLink": "Send Reset Link",
+    "backToLogin": "Back to login"
   },
   "map": {
     "addComment": "Add Comment",

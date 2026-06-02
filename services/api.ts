@@ -364,6 +364,16 @@ export const api = {
     if (!response.ok) throw new Error('Failed to add comment');
     return response.json();
   },
+
+  async forgotPassword(email: string) {
+    const response = await this.fetch('/api/v1/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+    // Always returns 200 with a generic message.
+    const data = await response.json();
+    return data.message;
+  },
 };
 
 // Simple JWT decode (without validation) to extract user ID from payload
