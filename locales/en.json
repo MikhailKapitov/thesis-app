@@ -19,7 +19,8 @@
     "forgotPasswordTitle": "Reset Password",
     "forgotPasswordPrompt": "Enter your email address to receive a reset link.",
     "sendResetLink": "Send Reset Link",
-    "backToLogin": "Back to login"
+    "backToLogin": "Back to login",
+    "error": "Error"
   },
   "map": {
     "addComment": "Add Comment",
@@ -109,7 +110,18 @@
     "notSignedIn": "Not signed in",
     "logout": "Log out",
     "logoutConfirm": "Are you sure you want to log out?",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "changePassword": "Change Password",
+    "changeEmail": "Change Email",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "newEmail": "New Email",
+    "passwordChanged": "Password changed successfully.",
+    "emailChanged": "Email updated.",
+    "changePasswordTitle": "Change Password",
+    "changeEmailTitle": "Change Email",
+    "save": "Save"
   },
   "tabs": {
     "settings": "Settings",
