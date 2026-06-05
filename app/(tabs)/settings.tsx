@@ -298,6 +298,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     marginBottom: 20,
+    marginTop: 20,
   },
   logoutText: {
     color: "#fff",
