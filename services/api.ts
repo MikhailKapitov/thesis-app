@@ -374,6 +374,68 @@ export const api = {
     const data = await response.json();
     return data.message;
   },
+
+  // Password change (direct fetch)
+  async changePassword(currentPassword: string, newPassword: string) {
+    const userId = await this.getUserId();
+    if (!userId) throw new Error('User ID not found');
+    const accessToken = await this.getAccessToken();
+
+    const response = await fetch(`${API_BASE_URL}/api/v1/auth/change-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': userId,
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      },
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      let message = errorText;
+      try {
+        const json = JSON.parse(errorText);
+        message = json.message || json.error || errorText;
+      } catch {}
+      throw new Error(message || 'Failed to change password');
+    }
+    return response.text();
+  },
+
+  // Email change (direct fetch)
+  async changeEmail(newEmail: string, currentPassword: string) {
+    const userId = await this.getUserId();
+    if (!userId) throw new Error('User ID not found');
+    const accessToken = await this.getAccessToken();
+
+    const response = await fetch(`${API_BASE_URL}/api/v1/auth/change-email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': userId,
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      },
+      body: JSON.stringify({ newEmail, currentPassword }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      let message = errorText;
+      try {
+        const json = JSON.parse(errorText);
+        message = json.message || json.error || errorText;
+      } catch {}
+      throw new Error(message || 'Failed to change email');
+    }
+
+    // Store new tokens (server returns them) and update cached user.
+    const tokens = await response.json();
+    await this.setTokens(tokens.accessToken, tokens.refreshToken);
+    const userIdFromToken = decodeUserIdFromToken(tokens.accessToken);
+    if (userIdFromToken) await this.setUserId(userIdFromToken);
+    return tokens;
+  },
 };
 
 // Simple JWT decode (without validation) to extract user ID from payload
