@@ -19,7 +19,8 @@
     "forgotPasswordTitle": "Құпия сөзді қалпына келтіру",
     "forgotPasswordPrompt": "Қалпына келтіру сілтемесін алу үшін электрондық пошта мекенжайыңызды енгізіңіз.",
     "sendResetLink": "Қалпына келтіру сілтемесін жіберу",
-    "backToLogin": "Кіруге оралу"
+    "backToLogin": "Кіруге оралу",
+    "error": "Қате"
   },
   "map": {
     "addComment": "Пікір қосу",
@@ -109,7 +110,18 @@
     "notSignedIn": "Кірмеген",
     "logout": "Шығу",
     "logoutConfirm": "Шыққыңыз келетініне сенімдісіз бе?",
-    "cancel": "Бас тарту"
+    "cancel": "Бас тарту",
+    "changePassword": "Құпия сөзді өзгерту",
+    "changeEmail": "Email-ды өзгерту",
+    "currentPassword": "Ағымдағы құпия сөз",
+    "newPassword": "Жаңа құпия сөз",
+    "confirmNewPassword": "Жаңа құпия сөзді растаңыз",
+    "newEmail": "Жаңа email",
+    "passwordChanged": "Құпия сөз сәтті өзгертілді.",
+    "emailChanged": "Email жаңартылды.",
+    "changePasswordTitle": "Құпия сөзді ауыстыру",
+    "changeEmailTitle": "Email-ды ауыстыру",
+    "save": "Сақтау"
   },
   "tabs": {
     "settings": "Параметрлер",

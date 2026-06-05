@@ -19,7 +19,8 @@
     "forgotPasswordTitle": "Сброс пароля",
     "forgotPasswordPrompt": "Введите адрес электронной почты, чтобы получить ссылку для сброса.",
     "sendResetLink": "Отправить ссылку для сброса",
-    "backToLogin": "Вернуться ко входу"
+    "backToLogin": "Вернуться ко входу",
+    "error": "Ошибка"
   },
   "map": {
     "addComment": "Добавить комментарий",
@@ -109,7 +110,18 @@
     "notSignedIn": "Не авторизован",
     "logout": "Выйти",
     "logoutConfirm": "Вы уверены, что хотите выйти?",
-    "cancel": "Отмена"
+    "cancel": "Отмена",
+    "changePassword": "Сменить пароль",
+    "changeEmail": "Сменить email",
+    "currentPassword": "Текущий пароль",
+    "newPassword": "Новый пароль",
+    "confirmNewPassword": "Подтвердите новый пароль",
+    "newEmail": "Новый email",
+    "passwordChanged": "Пароль успешно изменён.",
+    "emailChanged": "Email обновлён.",
+    "changePasswordTitle": "Смена пароля",
+    "changeEmailTitle": "Смена email",
+    "save": "Сохранить"
   },
   "tabs": {
     "settings": "Настройки",
