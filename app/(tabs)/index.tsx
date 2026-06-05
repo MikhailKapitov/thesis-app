@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -27,11 +27,16 @@ export default function MapScreen() {
   const [commentNoiseClass, setCommentNoiseClass] = useState("");
   const [commentNoiseLevel, setCommentNoiseLevel] = useState("");
   const [submittingComment, setSubmittingComment] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const { lastLocation, isAcquiring } = useLocation();
   const { user } = useAuth();
   const colors = useThemeColors();
   const { t, locale } = useLanguage();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const finalHtml = MAP_HTML
     .replace(
@@ -95,16 +100,21 @@ export default function MapScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
-      <WebView
-        ref={webRef}
-        // key={locale}
-        style={[styles.map, { backgroundColor: colors.backgroundColor }]}
-        source={{ html: finalHtml }}
-        originWhitelist={["*"]}
-        javaScriptEnabled
-        domStorageEnabled
-        mixedContentMode="always"
-      />
+      {mounted ? (
+        <WebView
+          ref={webRef}
+          // key={locale}
+          style={[styles.map, { backgroundColor: colors.backgroundColor }]}
+          source={{ html: finalHtml }}
+          originWhitelist={["*"]}
+          javaScriptEnabled
+          domStorageEnabled
+          mixedContentMode="always"
+        />
+        ): (
+          <View style={[styles.map, { backgroundColor: colors.backgroundColor }]} />
+        )
+      }
 
       {/* Add comment button – only visible if logged in */}
       {user && (
