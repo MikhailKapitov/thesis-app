@@ -178,5 +178,13 @@
       "title": "Месяц подряд",
       "description": "Записывайте звук 30 дней подряд"
     }
+  },
+  "noiseClasses": {
+    "transport": "Транспорт",
+    "human": "Люди",
+    "alert": "Тревога",
+    "building_noise": "Строительный шум",
+    "animals": "Животные",
+    "others": "Другое"
   }
 }

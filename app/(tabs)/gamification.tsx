@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -205,7 +205,7 @@ export default function GamificationScreen() {
         <Text style={[styles.subSectionTitle, { color: colors.isDark ? '#ccc' : '#4b5563' }]}>{t('gamification.byNoiseType')}</Text>
         {Object.entries(cityStats.measurementsByNoiseClass ?? {}).map(([cls, count]) => (
           <View key={cls} style={styles.classRow}>
-            <Text style={[styles.className, { color: colors.isDark ? '#ccc' : '#4b5563' }]}>{cls}</Text>
+            <Text style={[styles.className, { color: colors.isDark ? '#ccc' : '#4b5563' }]}>{t(`noiseClasses.${cls}`)}</Text>
             <View style={[styles.classBarContainer, { backgroundColor: colors.isDark ? '#333' : '#e5e7eb' }]}>
               <View style={[
                 styles.classBar,
@@ -239,7 +239,7 @@ export default function GamificationScreen() {
             <Text style={[styles.subSectionTitle, { color: colors.isDark ? '#ccc' : '#4b5563' }]}>{t('gamification.yourNoiseMix')}</Text>
             {Object.entries(myStats.recordingsByNoiseClass ?? {}).map(([cls, count]) => (
               <View key={cls} style={styles.classRow}>
-                <Text style={[styles.className, { color: colors.isDark ? '#ccc' : '#4b5563' }]}>{cls}</Text>
+                <Text style={[styles.className, { color: colors.isDark ? '#ccc' : '#4b5563' }]}>{t(`noiseClasses.${cls}`)}</Text>
                 <View style={[styles.classBarContainer, { backgroundColor: colors.isDark ? '#333' : '#e5e7eb' }]}>
                   <View style={[
                     styles.classBar,
@@ -297,7 +297,7 @@ export default function GamificationScreen() {
                     </View>
                     {rec.status === 'CLASSIFIED' ? (
                       <Text style={[styles.recentDetail, { color: colors.isDark ? '#ccc' : '#4b5563' }]}>
-                        {rec.noiseLevelDba?.toFixed(1)} dB · {rec.noiseClass}
+                        {rec.noiseLevelDba?.toFixed(1)} dB · {t(`noiseClasses.${rec.noiseClass}`)}
                       </Text>
                     ) : (
                       <Text style={[styles.recentDetail, { color: colors.isDark ? '#888' : '#9ca3af' }]}>

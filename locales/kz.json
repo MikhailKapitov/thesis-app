@@ -178,5 +178,13 @@
       "title": "Ай қатарынан",
       "description": "30 күн бойы дыбыс жазыңыз"
     }
+  },
+  "noiseClasses": {
+    "transport": "Көлік",
+    "human": "Адамдар",
+    "alert": "Дабыл",
+    "building_noise": "Құрылыс шуы",
+    "animals": "Жануарлар",
+    "others": "Басқа"
   }
 }

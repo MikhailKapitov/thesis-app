@@ -178,5 +178,13 @@
       "title": "One Month Streak",
       "description": "Record for 30 days in a row"
     }
+  },
+  "noiseClasses": {
+    "transport": "Transport",
+    "human": "Humans",
+    "alert": "Alert",
+    "building_noise": "Building Noise",
+    "animals": "Animals",
+    "others": "Others"
   }
 }
