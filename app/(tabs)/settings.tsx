@@ -3,6 +3,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import { useLanguage } from '@/context/LanguageContext';
 import LanguagePicker from '@/components/LanguagePicker';
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function SettingsScreen() {
   const { user, logout } = useAuth();
@@ -24,22 +25,29 @@ export default function SettingsScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
-      <Text style={[styles.title, { color: colors.textColor }]}>{t('settings.title')}</Text>
-
       <View style={{ position: 'absolute', top: 64, right: 12, zIndex: 10 }}>
         <LanguagePicker />
       </View>
 
-      <View style={styles.section}>
-        <Text style={[styles.label, { color: colors.isDark ? '#888' : '#6b7280' }]}>{t('settings.account')}</Text>
-        <View style={[styles.card, { backgroundColor: colors.inputBg }]}>
-          <Text style={[styles.userInfo, { color: colors.textColor }]}>
-            {t('settings.email')}: {user?.email || t('settings.notSignedIn')}
-          </Text>
-          <Text style={[styles.userInfo, { color: colors.textColor }]}>{t('settings.name')}: {user?.displayName || "—"}</Text>
+      {/* Profile section. */}
+      <View style={styles.profileSection}>
+        {/* Avatar. */}
+        <View style={[styles.avatarContainer, { backgroundColor: colors.inputBg }]}>
+          <Ionicons name="person" size={100} color={colors.linkColor} />
         </View>
+
+        {/* Display name. */}
+        <Text style={[styles.displayName, { color: colors.textColor }]}>
+          {user?.displayName || "—"}
+        </Text>
+
+        {/* Email. */}
+        <Text style={[styles.email, { color: colors.isDark ? '#aaa' : '#6b7280' }]}>
+          {user?.email || t('settings.notSignedIn')}
+        </Text>
       </View>
 
+      {/* Logout button. */}
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutText}>{t('settings.logout')}</Text>
       </TouchableOpacity>
@@ -53,34 +61,33 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 60,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 24,
+  profileSection: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: -240,
   },
-  section: {
-    marginBottom: 32,
+  avatarContainer: {
+    width: 160,
+    height: 160,
+    borderRadius: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
   },
-  label: {
-    fontSize: 14,
+  displayName: {
+    fontSize: 24,
+    fontWeight: 'bold',
     marginBottom: 8,
-    textTransform: "uppercase",
-    letterSpacing: 1,
   },
-  card: {
-    borderRadius: 12,
-    padding: 16,
-  },
-  userInfo: {
+  email: {
     fontSize: 16,
-    marginBottom: 8,
   },
   logoutButton: {
     backgroundColor: "#dc2626",
     padding: 16,
     borderRadius: 12,
     alignItems: "center",
-    marginTop: "auto",
     marginBottom: 20,
   },
   logoutText: {
