@@ -172,11 +172,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   title: {
-    fontSize: 28,
+    flex: 1,
+    flexWrap: 'wrap',
+    fontSize: 18,
     fontWeight: 'bold',
   },
   markAllText: {
-    fontSize: 14,
+    fontSize: 12,
   },
   listContent: {
     paddingBottom: 20,

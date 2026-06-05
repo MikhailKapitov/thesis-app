@@ -16,6 +16,7 @@ import { useAuth } from "@/context/AuthContext";
 import { api } from "@/services/api";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import { useLanguage } from '@/context/LanguageContext';
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://10.0.2.2:5000";
 
@@ -111,7 +112,7 @@ export default function MapScreen() {
           style={[
             styles.commentBtn,
             !isLocationReady && styles.commentBtnDisabled,
-            { backgroundColor: isLocationReady ? "#22c55e" : "#555" },
+            { backgroundColor: isLocationReady ? "#2563eb" : "#555" },
           ]}
           onPress={() => {
             if (isLocationReady) setCommentModalVisible(true);
@@ -131,7 +132,7 @@ export default function MapScreen() {
         {lastLocation == null ? (
           <ActivityIndicator size="small" color="#fff" />
         ) : (
-          <Text style={styles.locateBtnText}>◎</Text>
+          <Ionicons name="locate-outline" size={24} color="#fff" />
         )}
       </TouchableOpacity>
 

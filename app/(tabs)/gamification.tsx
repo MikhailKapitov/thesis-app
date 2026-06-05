@@ -39,6 +39,7 @@ interface GamificationProfile {
 interface LeaderboardEntry {
   rank: number;
   userId: string;
+  displayName: string;
   totalPoints: number;
   totalRecordings: number;
   level: number;
@@ -132,7 +133,7 @@ export default function GamificationScreen() {
         </View>
         <View style={styles.leaderInfo}>
           <Text style={[styles.leaderName, { color: colors.textColor }]} numberOfLines={1}>
-            {isYou ? t('gamification.you') : `${item.userId.slice(0, 8)}...`}
+            {isYou ? t('gamification.you') : (item.displayName || `${item.userId.slice(0, 8)}...`)}
           </Text>
           <Text style={[styles.leaderStats, { color: colors.isDark ? '#94a3b8' : '#6b7280' }]}>{item.totalPoints} {t('gamification.pts')} · {t('gamification.level')} {item.level}</Text>
         </View>
@@ -259,19 +260,19 @@ export default function GamificationScreen() {
           style={[styles.tab, activeTab === 'profile' && { backgroundColor: colors.linkColor }]}
           onPress={() => setActiveTab('profile')}
         >
-          <Text style={[styles.tabText, { color: activeTab === 'profile' ? '#fff' : colors.textColor }]}>{t('gamification.me')}</Text>
+          <Text style={[styles.tabText, { color: activeTab === 'profile' ? '#fff' : colors.textColor }]} numberOfLines={1}>{t('gamification.me')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tab, activeTab === 'leaderboard' && { backgroundColor: colors.linkColor }]}
           onPress={() => setActiveTab('leaderboard')}
         >
-          <Text style={[styles.tabText, { color: activeTab === 'leaderboard' ? '#fff' : colors.textColor }]}>{t('gamification.leaderboard')}</Text>
+          <Text style={[styles.tabText, { color: activeTab === 'leaderboard' ? '#fff' : colors.textColor }]} numberOfLines={1}>{t('gamification.leaderboard')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tab, activeTab === 'statistics' && { backgroundColor: colors.linkColor }]}
           onPress={() => setActiveTab('statistics')}
         >
-          <Text style={[styles.tabText, { color: activeTab === 'statistics' ? '#fff' : colors.textColor }]}>{t('gamification.statistics')}</Text>
+          <Text style={[styles.tabText, { color: activeTab === 'statistics' ? '#fff' : colors.textColor }]} numberOfLines={1}>{t('gamification.statistics')}</Text>
         </TouchableOpacity>
       </View>
 

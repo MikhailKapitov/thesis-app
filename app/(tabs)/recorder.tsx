@@ -19,8 +19,8 @@ import { api } from "@/services/api";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import { useLanguage } from '@/context/LanguageContext';
 
-const COUNTDOWN_SEC = 5;
-const RECORD_DURATION_MS = 2000;
+const COUNTDOWN_SEC = 15;
+const RECORD_DURATION_MS = 5000;
 const CHANNEL_ID = "recorder";
 
 // Store translation keys and params instead of basic translated strings.
