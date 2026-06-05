@@ -145,7 +145,7 @@ export default function SettingsScreen() {
       {/* Change Password Modal */}
       <Modal visible={showPasswordModal} transparent animationType="slide">
         <View style={styles.modalBackdrop}>
-          <View style={[styles.modalContent, { backgroundColor: colors.cardBg || colors.inputBg }]}>
+          <View style={[styles.modalContent, { backgroundColor: colors.modalBg || colors.inputBg }]}>
             <Text style={[styles.modalTitle, { color: colors.textColor }]}>
               {t('settings.changePasswordTitle')}
             </Text>
@@ -199,7 +199,7 @@ export default function SettingsScreen() {
       {/* Change Email Modal */}
       <Modal visible={showEmailModal} transparent animationType="slide">
         <View style={styles.modalBackdrop}>
-          <View style={[styles.modalContent, { backgroundColor: colors.cardBg || colors.inputBg }]}>
+          <View style={[styles.modalContent, { backgroundColor: colors.modalBg || colors.inputBg }]}>
             <Text style={[styles.modalTitle, { color: colors.textColor }]}>
               {t('settings.changeEmailTitle')}
             </Text>

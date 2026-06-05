@@ -154,7 +154,7 @@ export default function MapScreen() {
         onRequestClose={() => setCommentModalVisible(false)}
       >
         <View style={styles.modalBackdrop}>
-          <View style={[styles.modalContent, { backgroundColor: colors.cardBg || colors.inputBg }]}>
+          <View style={[styles.modalContent, { backgroundColor: colors.modalBg || colors.inputBg }]}>
             <Text style={[styles.modalTitle, { color: colors.textColor }]}>{t('map.addComment')}</Text>
 
             <TextInput
