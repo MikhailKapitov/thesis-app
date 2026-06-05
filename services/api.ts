@@ -222,8 +222,8 @@ export const api = {
     // Standard React Native file upload shape – works with any URI string
     formData.append('audio', {
       uri: audioUri,
-      type: 'audio/wav',
-      name: 'recording.wav',
+      type: 'audio/mp4',
+      name: 'recording.mp4',
     } as any);
 
     // Server now expects separate fields, not a metadata JSON
@@ -236,7 +236,7 @@ export const api = {
       method: 'POST',
       headers: {
         'X-User-Id': userId,
-        // No Content-Type – fetch will set multipart/form-data automatically
+        // No Content-Type -- fetch will set multipart/form-data automatically.
       },
       body: formData,
     });
