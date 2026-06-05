@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "NoiseApp",
-    "slug": "NoiseApp",
+    "name": "NoiseWatch",
+    "slug": "NoiseWatch",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "noiseapp",
+    "scheme": "noisewatch",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.NoiseApp"
+      "bundleIdentifier": "com.anonymous.NoiseWatch"
     },
     "android": {
       "adaptiveIcon": {
@@ -44,7 +44,7 @@
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
       ],
-      "package": "com.anonymous.NoiseApp"
+      "package": "com.anonymous.NoiseWatch"
     },
     "web": {
       "output": "static",
@@ -77,7 +77,7 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow NoiseApp to use your location.",
+          "locationAlwaysAndWhenInUsePermission": "Allow NoiseWatch to use your location.",
           "isAndroidBackgroundLocationEnabled": true
         }
       ]
