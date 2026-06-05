@@ -69,6 +69,9 @@
     "maxDb": "Макс. дБ",
     "measurements": "Өлшемдер",
     "contributors": "Қатысушылар",
+    "recentRecordings": "Соңғы жазбалар",
+    "noRecentRecordings": "Әзірге жазбалар жоқ.",
+    "pendingClassification": "Классификация күтілуде…",
     "recommendation": {
       "goodLevel": "Сіздің ортаңыз ДДҰ нормаларына сәйкес. Керемет акустикалық жағдай!",
       "moderateLevel": "Орташа шу деңгейі. Тыныш жерлерде үзіліс жасау ұсынылады.",

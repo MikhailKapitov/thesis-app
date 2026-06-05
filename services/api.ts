@@ -436,6 +436,21 @@ export const api = {
     if (userIdFromToken) await this.setUserId(userIdFromToken);
     return tokens;
   },
+
+  async getMyRecordings(page = 0, size = 5) {
+    const userId = await this.getUserId();
+    if (!userId) throw new Error('User ID not found');
+    const token = await this.getAccessToken();
+    const res = await fetch(`${API_BASE_URL}/api/v1/recordings/my?page=${page}&size=${size}`, {
+      headers: {
+        'X-User-Id': userId,
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    if (!res.ok) throw new Error('Failed to fetch recordings');
+    const data = await res.json();
+    return data.content;
+  },
 };
 
 // Simple JWT decode (without validation) to extract user ID from payload

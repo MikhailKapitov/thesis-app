@@ -13,12 +13,14 @@ import {
 import { api } from '@/services/api';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { useLanguage } from '@/context/LanguageContext';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { useFocusEffect } from '@react-navigation/native';
 
-// ---------- Helper ----------
+// Helper
 const formatDba = (value: number | null | undefined) =>
   value != null ? value.toFixed(1) : 'N/A';
 
-// ---------- Type definitions ----------
+// Type definitions
 interface Achievement {
   code: string;
   title: string;
@@ -64,17 +66,31 @@ interface MyStats {
   recommendationKey: string;
 }
 
+interface Recording {
+  id: string;
+  latitude: number;
+  longitude: number;
+  status: string;
+  noiseLevelDba: number | null;
+  noiseClass: string | null;
+  confidenceScore: number | null;
+  recordedAt: string;
+  createdAt: string;
+}
+
 type ActiveTab = 'profile' | 'leaderboard' | 'statistics';
 
-// ---------- Component ----------
+// Component
 export default function GamificationScreen() {
   const [profile, setProfile] = useState<GamificationProfile | null>(null);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [cityStats, setCityStats] = useState<CityStats | null>(null);
   const [myStats, setMyStats] = useState<MyStats | null>(null);
+  const [recentRecordings, setRecentRecordings] = useState<Recording[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<ActiveTab>('profile');
+  const [showRecentRecordings, setShowRecentRecordings] = useState(false);
   const colors = useThemeColors();
   const { t } = useLanguage();
 
@@ -82,16 +98,18 @@ export default function GamificationScreen() {
     if (!silent) setLoading(true);
     setRefreshing(true);
     try {
-      const [profileData, leaderboardData, cityStatsData, myStatsData] = await Promise.all([
+      const [profileData, leaderboardData, cityStatsData, myStatsData, recordings] = await Promise.all([
         api.getGamificationProfile(),
         api.getLeaderboard(20),
         api.getCityStats(),
         api.getMyStats(),
+        api.getMyRecordings(0, 8),
       ]);
       setProfile(profileData);
       setLeaderboard(leaderboardData);
       setCityStats(cityStatsData);
       setMyStats(myStatsData);
+      setRecentRecordings([...recordings].reverse());
     } catch (err: any) {
       Alert.alert('Error', err.message);
     } finally {
@@ -100,11 +118,13 @@ export default function GamificationScreen() {
     }
   }, []);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [fetchData])
+  );
 
-  // ---------- Renderers ----------
+  // Renderers
   const renderAchievement = ({ item }: { item: Achievement }) => (
     <View style={[styles.achievementCard, { backgroundColor: colors.cardBg || colors.inputBg, borderLeftColor: '#fbbf24' }]}>
       <View style={styles.achievementTitleRow}>
@@ -142,7 +162,7 @@ export default function GamificationScreen() {
     );
   };
 
-  // ---------- Statistics tab content ----------
+  // Statistics tab content
   const renderStatistics = () => {
     if (!cityStats || !myStats) {
       return (
@@ -239,11 +259,62 @@ export default function GamificationScreen() {
             <Text style={[styles.recommendationText, { color: colors.isDark ? '#ddd' : '#374151' }]}>{t(`gamification.recommendation.${myStats.recommendationKey}`)}</Text>
           </View>
         ) : null}
+
+        {/* Recent Recordings (collapsible) */}
+        <View style={styles.recentSection}>
+          <TouchableOpacity
+            style={styles.recentHeader}
+            onPress={() => setShowRecentRecordings(!showRecentRecordings)}
+          >
+            <Text style={[styles.recentTitle, { color: colors.textColor }]}>
+              {t('gamification.recentRecordings')} ({recentRecordings.length})
+            </Text>
+            <Ionicons
+              name={showRecentRecordings ? 'chevron-up' : 'chevron-down'}
+              size={20}
+              color={colors.textColor}
+            />
+          </TouchableOpacity>
+
+          {showRecentRecordings && (
+            <View style={styles.recentList}>
+              {recentRecordings.length === 0 ? (
+                <Text style={[styles.recentEmpty, { color: colors.placeholderColor }]}>
+                  {t('gamification.noRecentRecordings')}
+                </Text>
+              ) : (
+                recentRecordings.map((rec) => (
+                  <View key={rec.id} style={[styles.recentItem, { backgroundColor: colors.inputBg }]}>
+                    <View style={styles.recentRow}>
+                      <Ionicons
+                        name={rec.status === 'PENDING' ? 'time-outline' : 'checkmark-circle-outline'}
+                        size={18}
+                        color={rec.status === 'PENDING' ? '#f59e0b' : '#22c55e'}
+                      />
+                      <Text style={[styles.recentDate, { color: colors.textColor }]}>
+                        {new Date(rec.recordedAt || rec.createdAt).toLocaleString()}
+                      </Text>
+                    </View>
+                    {rec.status === 'CLASSIFIED' ? (
+                      <Text style={[styles.recentDetail, { color: colors.isDark ? '#ccc' : '#4b5563' }]}>
+                        {rec.noiseLevelDba?.toFixed(1)} dB · {rec.noiseClass}
+                      </Text>
+                    ) : (
+                      <Text style={[styles.recentDetail, { color: colors.isDark ? '#888' : '#9ca3af' }]}>
+                        {t('gamification.pendingClassification')}
+                      </Text>
+                    )}
+                  </View>
+                ))
+              )}
+            </View>
+          )}
+        </View>
       </ScrollView>
     );
   };
 
-  // ---------- Main view ----------
+  // Main view
   if (loading && !profile) {
     return (
       <View style={[styles.centered, { backgroundColor: colors.backgroundColor }]}>
@@ -520,5 +591,44 @@ const styles = StyleSheet.create({
   },
   recommendationText: {
     fontSize: 14,
+  },
+  recentSection: {
+    marginTop: 24,
+  },
+  recentHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  recentTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  recentList: {
+    marginTop: 4,
+  },
+  recentEmpty: {
+    fontSize: 13,
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  recentItem: {
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 6,
+  },
+  recentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  recentDate: {
+    marginLeft: 8,
+    fontSize: 13,
+  },
+  recentDetail: {
+    fontSize: 12,
+    marginLeft: 26,
   },
 });

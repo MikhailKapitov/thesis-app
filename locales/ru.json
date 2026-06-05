@@ -69,6 +69,9 @@
     "maxDb": "Макс. дБ",
     "measurements": "Измерений",
     "contributors": "Участников",
+    "recentRecordings": "Последние записи",
+    "noRecentRecordings": "Записей пока нет.",
+    "pendingClassification": "Ожидает классификации…",
     "recommendation": {
       "goodLevel": "Ваше окружение в пределах нормы ВОЗ. Отличная акустическая обстановка!",
       "moderateLevel": "Умеренный уровень шума. Рекомендуется делать перерывы в тихих местах.",
