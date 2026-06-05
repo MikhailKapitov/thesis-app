@@ -198,7 +198,7 @@ export default function MapScreen() {
                 style={[
                   styles.submitBtn,
                   !commentText.trim() && styles.disabledBtn,
-                  { backgroundColor: commentText.trim() ? "#22c55e" : "#555" },
+                  { backgroundColor: commentText.trim() ? colors.linkColor : "#555" },
                 ]}
                 onPress={handleAddComment}
                 disabled={!commentText.trim() || submittingComment}
