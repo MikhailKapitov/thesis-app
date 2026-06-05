@@ -114,34 +114,35 @@ export default function SettingsScreen() {
           {user?.email || t('settings.notSignedIn')}
         </Text>
 
-        {/* New buttons for changing password and email */}
-        <View style={styles.actionButtons}>
-          <TouchableOpacity
-            style={[styles.actionBtn, { borderColor: colors.linkColor }]}
-            onPress={() => setShowPasswordModal(true)}
-          >
-            <Text style={[styles.actionBtnText, { color: colors.linkColor }]}>
-              {t('settings.changePassword')}
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.actionBtn, { borderColor: colors.linkColor }]}
-            onPress={() => setShowEmailModal(true)}
-          >
-            <Text style={[styles.actionBtnText, { color: colors.linkColor }]}>
-              {t('settings.changeEmail')}
-            </Text>
-          </TouchableOpacity>
-        </View>
       </View>
 
-      {/* Logout button – stuck to bottom */}
+      {/* Buttons for changing password and email */}
+      <View style={styles.actionButtons}>
+        <TouchableOpacity
+          style={[styles.actionBtn, { backgroundColor: colors.linkColor }]}
+          onPress={() => setShowPasswordModal(true)}
+        >
+          <Text style={styles.actionBtnText}>
+            {t('settings.changePassword')}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.actionBtn, { backgroundColor: colors.linkColor }]}
+          onPress={() => setShowEmailModal(true)}
+        >
+          <Text style={styles.actionBtnText}>
+            {t('settings.changeEmail')}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Logout Button */}
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutText}>{t('settings.logout')}</Text>
       </TouchableOpacity>
 
-      {/* ── Change Password Modal ── */}
+      {/* Change Password Modal */}
       <Modal visible={showPasswordModal} transparent animationType="slide">
         <View style={styles.modalBackdrop}>
           <View style={[styles.modalContent, { backgroundColor: colors.cardBg || colors.inputBg }]}>
@@ -195,7 +196,7 @@ export default function SettingsScreen() {
         </View>
       </Modal>
 
-      {/* ── Change Email Modal ── */}
+      {/* Change Email Modal */}
       <Modal visible={showEmailModal} transparent animationType="slide">
         <View style={styles.modalBackdrop}>
           <View style={[styles.modalContent, { backgroundColor: colors.cardBg || colors.inputBg }]}>
@@ -275,18 +276,21 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   actionButtons: {
-    flexDirection: 'row',
-    gap: 12,
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 20,
   },
   actionBtn: {
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    width: '100%',
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 12,
   },
   actionBtnText: {
-    fontSize: 14,
-    fontWeight: '500',
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
   logoutButton: {
     backgroundColor: "#dc2626",
