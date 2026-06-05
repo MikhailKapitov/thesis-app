@@ -11,8 +11,11 @@ if (!fs.existsSync(HTML_SOURCE)) {
 
 let html = fs.readFileSync(HTML_SOURCE, "utf8");
 
-// Escape backticks and template literal placeholders
-html = html.replace(/`/g, "\\`").replace(/\$\{/g, "\\${");
+// Escape backslashes, backticks and template literal placeholders
+html = html
+  .replace(/\\/g, "\\\\")
+  .replace(/`/g, "\\`")
+  .replace(/\$\{/g, "\\${");
 
 const content = `// Auto-generated from map-viewer/viewer.html – do not edit manually.
 export const MAP_HTML = \`${html}\`;
