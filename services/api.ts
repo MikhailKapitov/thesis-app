@@ -440,12 +440,8 @@ export const api = {
   async getMyRecordings(page = 0, size = 5) {
     const userId = await this.getUserId();
     if (!userId) throw new Error('User ID not found');
-    const token = await this.getAccessToken();
-    const res = await fetch(`${API_BASE_URL}/api/v1/recordings/my?page=${page}&size=${size}`, {
-      headers: {
-        'X-User-Id': userId,
-        'Authorization': `Bearer ${token}`,
-      },
+    const res = await this.fetch(`/api/v1/recordings/my?page=${page}&size=${size}`, {
+      headers: { 'X-User-Id': userId },
     });
     if (!res.ok) throw new Error('Failed to fetch recordings');
     const data = await res.json();
