@@ -40,7 +40,19 @@ export default function RegisterScreen() {
     try {
       await register(email, password, displayName);
     } catch (error: any) {
-      Alert.alert(t('auth.registerFailed'), error.message);
+      let errorText = error.message;
+      try {
+        const parsed = JSON.parse(error.message);
+        if (parsed.validationErrors) {
+          errorText = Object.values(parsed.validationErrors).join('\n');
+        } else {
+          errorText = parsed.message;
+        }
+      } catch (e) {
+        // Not JSON, keep the OG message.
+      }
+      // console.log(error, errorText);
+      Alert.alert(t('auth.registerFailed'), errorText);
     } finally {
       setLoading(false);
     }
