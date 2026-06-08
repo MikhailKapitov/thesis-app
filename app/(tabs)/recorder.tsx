@@ -20,6 +20,7 @@ import { useThemeColors } from "@/hooks/useThemeColors";
 import { useLanguage } from '@/context/LanguageContext';
 
 const COUNTDOWN_SEC = 15;
+const INITIAL_COUNTDOWN_SEC = 5;
 const RECORD_DURATION_MS = 5000;
 const CHANNEL_ID = "recorder";
 
@@ -195,7 +196,7 @@ export default function RecorderScreen() {
 
   const toggle = async () => {
     if (!isRunning) {
-      setCountdown(COUNTDOWN_SEC);
+      setCountdown(INITIAL_COUNTDOWN_SEC);
       setIsRunning(true);
       await notifee.displayNotification({
         title: t('recorder.notificationTitle'),
